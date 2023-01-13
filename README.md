@@ -53,4 +53,7 @@ npm i style-loader css-loader
 # 웹팩을 실행하는 명령어
 npx webpack
 
+# router
+npm i react-router react-router-dom
+
 

@@ -1,8 +1,16 @@
-import React from 'react'
+import React, { FC } from 'react';
+import {BrowserRouter, Switch, Route, Redirect} from 'react-router-dom';
 
-function App() {
+import LogIn from '@pages/LogIn';
+import SignUp from '@pages/SignUp';
+
+const App: FC = () => {
   return (
-    <div>wait!!</div>
+    <Switch>
+      <Redirect exact path="/" to="/login" />
+      <Route path="/login" component={LogIn} />
+      <Route path="/signup" component={SignUp} />
+    </Switch>
   )
 }
 
