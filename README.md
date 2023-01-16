@@ -57,3 +57,10 @@ npx webpack
 npm i react-router react-router-dom
 
 
+
+npm i @loadable/component
+npm i -D @types/loadable__component
+
+npm i @emotion/react @emotion/styled
+
+
