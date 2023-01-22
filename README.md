@@ -63,4 +63,6 @@ npm i -D @types/loadable__component
 
 npm i @emotion/react @emotion/styled
 
+npm i @emotion/babel-plugin styled 쓸 때 변수명으로 다른 곳에서 샐럭터 가능하다.
+
 

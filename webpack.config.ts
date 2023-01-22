@@ -1,8 +1,10 @@
 import path from 'path';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
-import webpack, { Configuration as WebpackConfiguration } from "webpack";
-import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
+import webpack, { Configuration as WebpackConfiguration } from 'webpack';
+import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
@@ -18,7 +20,8 @@ const config: Configuration = {
   devtool: !isDevelopment ? 'hidden-source-map' : 'eval', // eval or inline-sourcemap
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-    alias: { // ../../ 대신 쓰는 것, ts에서도 webpack에서도 해줘야한다.
+    alias: {
+      // ../../ 대신 쓰는 것, ts에서도 webpack에서도 해줘야한다.
       '@hooks': path.resolve(__dirname, 'hooks'),
       '@components': path.resolve(__dirname, 'components'),
       '@layouts': path.resolve(__dirname, 'layouts'),
@@ -50,7 +53,10 @@ const config: Configuration = {
           ],
           env: {
             development: {
-              plugins: [require.resolve('react-refresh/babel')],
+              plugins: ['@emotion', require.resolve('react-refresh/babel')],
+            },
+            production: {
+              plugins: [['@emotion', { sourceMap: true }]],
             },
           },
         },
@@ -63,15 +69,20 @@ const config: Configuration = {
     ],
   },
   plugins: [
-    new ForkTsCheckerWebpackPlugin({ // ts 할때 사용할 것.
+    new ForkTsCheckerWebpackPlugin({
+      // ts 할때 사용할 것.
       async: false,
       // eslint: {
       //   files: "./src/**/*",
       // },
     }),
     new webpack.EnvironmentPlugin({ NODE_ENV: isDevelopment ? 'development' : 'production' }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env),
+    }),
   ],
-  output: { // 설정에 따라 만들어진 파일이 어디에 나올지. [name]은 저 위에 entry.app 에 있는 이름이 된다.
+  output: {
+    // 설정에 따라 만들어진 파일이 어디에 나올지. [name]은 저 위에 entry.app 에 있는 이름이 된다.
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
     publicPath: '/dist/',
@@ -83,6 +94,7 @@ const config: Configuration = {
     static: { directory: path.resolve(__dirname) },
     proxy: {
       '/api/': {
+        // front에서 /api/로 요청한 건은 3095가 보낸것 처럼 바꿔서 보내겠다.
         target: 'http://localhost:3095',
         changeOrigin: true,
       },
