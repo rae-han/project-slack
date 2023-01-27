@@ -81,9 +81,9 @@ https://github.com/ZeroCho/sleact
     - 두개를 연결해주면 prettier에 위배되는 코드도 오류표시 해준다.
     - 설정한다고 바로 되는건 아니고 에디터에서 설정을 해줘야함. 웹스톰 기준 Prettier 항목 들어가서 저장 시... 에 체크
     ```markdown
-    npm i -D eslint
-    npm i -D prettier eslint-plugin-prettier eslint-config-prettier
+    npm i -D eslint prettier eslint-plugin-prettier eslint-config-prettier
     ```
+    - 이후 .eslintrc, .prettierrc 파일에 설정을 해준다.
   - tsconfig.json
     - 타입스크립트 설정
     - target은 빌드의 결과물을 어떤 버전으로 할지 작성한다.. 기본 값은 es3
@@ -173,9 +173,41 @@ react-router v5 -> v6 가 되면서 Redirect 컴포넌트 대신 Navigate 컴포
 즉 로그아웃 하려면 코드에서 쿠키를 날리면 된다?
 CORS 에러가 뜰때 프론트에서 프록시를 사용하는 방법도 있지만, 백엔드에서 해결해주는 방법도 있다. 
 그럴 경우 옵션즈라는 요청이 하나 더 가는데  
-로그인을 성공한 상태면 서버에서 데이터를 주는데 그걸 가지고 있으면 된다. 그걸 저장하고 있으려면 전역 스테이트인 리덕스가 필요하다.
+로그인을 성공한 상태면 서버에서 데이터를 주는데 그걸 가지고 로그인 유무를 판단하면 된다. 그걸 저장하고 있으려면 전역 스테이트인 리덕스가 필요하다.
 리덕스를 떼내려면?? contextAPI, SWR, react-query
-SWR는 
+SWR는 요청을 보내서 받아온 데이터를 저장을 해둔다.
+요청은 보통 get이다. post를 못쓰는건 아닌데 보통은 get요청에 대한 응답을 저장하고 있는다.
+그냥 post 날리고 get 요청 한번 더 날리면 된다.
+swr은 next만든 곳에서 만든 라이브러리.
+
+```markdown
+npm i @tanstack/react-query @tanstack/react-query-devtools
+```
+```typescript jsx
+// client.tsx
+import React from 'react';
+// import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+import App from './layouts/App';
+
+const container = document.querySelector('#app');
+const root = createRoot(container!); // createRoot(container!) if you use TypeScript
+
+const queryClient = new QueryClient();
+
+root.render(
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>,
+);
+```
 
 
 

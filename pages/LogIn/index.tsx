@@ -1,21 +1,20 @@
 import useInput from '@hooks/useInput';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from '@pages/SignUp/styles';
 import { User } from '@typings/db';
-// import fetcher from '@utils/fetcher';
+import fetcher from '@utils/fetcher';
 import axios, { AxiosError } from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { FormEventHandler, MouseEventHandler, useCallback, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // npm i @tanstack/react-query
 
 const LogIn = () => {
   const queryClient = useQueryClient();
-  const { isLoading, isSuccess, status, isError, data, error } = useQuery('user', () =>
+  const { isLoading, isSuccess, status, isError, data, error } = useQuery(['user'], () =>
     fetcher({ queryKey: '/api/users' }),
   );
-  // const { data, error, revalidate, mutate } = useSWR('/api/users', fetcher);
   const mutation = useMutation<User, AxiosError, { email: string; password: string }>(
-    'user',
+    ['user'],
     (data) =>
       axios
         .post('/api/users/login', data, {
@@ -27,7 +26,7 @@ const LogIn = () => {
         setLogInError(false);
       },
       onSuccess() {
-        queryClient.refetchQueries('user');
+        queryClient.refetchQueries(['user']);
       },
       onError(error) {
         setLogInError(error.response?.data?.code === 401);
@@ -38,7 +37,7 @@ const LogIn = () => {
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
-  const onSubmit = useCallback(
+  const onSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (e) => {
       e.preventDefault();
       mutation.mutate({ email, password });
