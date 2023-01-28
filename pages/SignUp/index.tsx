@@ -76,7 +76,7 @@ const SignUp = () => {
 
   return (
     <div id="container">
-      <Header>{process.env.REACT_APP_SERVICE_NAME}</Header>
+      <Header>{process.env.SERVICE_NAME}</Header>
       <Form onSubmit={onSubmit}>
         {/*<Form>*/}
         <Label id="email-label">
