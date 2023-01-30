@@ -35,8 +35,8 @@ const LogIn = () => {
   );
 
   const [logInError, setLogInError] = useState(false);
-  const [email, onChangeEmail] = useInput('');
-  const [password, onChangePassword] = useInput('');
+  const [email, onChangeEmail] = useInput('qwer@qwer.qwer');
+  const [password, onChangePassword] = useInput('qwer');
   const onSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (e) => {
       e.preventDefault();
@@ -50,13 +50,13 @@ const LogIn = () => {
   }
 
   if (data) {
-    return <Navigate to="/workspace/sleact/channel/일반" />;
+    return <Navigate to="/workspace/channel" />;
   }
 
   // console.log(error, userData);
   // if (!error && userData) {
   //   console.log('로그인됨', userData);
-  //   return <Navigate to="/workspace/sleact/channel/일반" />;
+  //   return <Navigate to="/workspace/channel/일반" />;
   // }
 
   return (

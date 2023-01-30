@@ -4,7 +4,9 @@ import React, { BaseSyntheticEvent, useCallback, useState, VFC } from 'react';
 import axios from 'axios';
 // import useSWR from 'swr';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from './styles';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import fetcher from '@utils/fetcher';
 
 // interface ReactEvent {
 //   (e: BaseSyntheticEvent): void;
@@ -13,6 +15,9 @@ type ReactEvent = (e: BaseSyntheticEvent) => void;
 
 const SignUp = () => {
   // const { data, error, revalidate } = useSWR('/api/users', fetcher);
+  const { isLoading, isSuccess, status, isError, data, error } = useQuery(['user'], () =>
+    fetcher({ queryKey: '/api/users' }),
+  );
 
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
@@ -65,14 +70,14 @@ const SignUp = () => {
     },
     [email, nickname, password, passwordCheck, mismatchError],
   );
-  //
-  // if (data === undefined) {
-  //   return <div>로딩중...</div>;
-  // }
-  //
-  // if (data) {
-  //   return <Redirect to="/workspace/sleact/channel/일반" />;
-  // }
+
+  if (data === undefined) {
+    return <div>로딩중...</div>;
+  }
+
+  if (data) {
+    return <Navigate to="/workspace/channel" />;
+  }
 
   return (
     <div id="container">
