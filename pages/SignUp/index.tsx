@@ -1,17 +1,19 @@
 import useInput from '@hooks/useInput';
 // import fetcher from '@utils/fetcher';
-import React, { BaseSyntheticEvent, EventHandler, useCallback, useState, VFC } from 'react';
+import React, {
+  BaseSyntheticEvent,
+  ChangeEventHandler,
+  FormEventHandler,
+  KeyboardEventHandler,
+  useCallback,
+  useState,
+} from 'react';
 import axios from 'axios';
 // import useSWR from 'swr';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from './styles';
 import { Link, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import fetcher from '@utils/fetcher';
-
-// interface ReactEvent {
-//   (e: BaseSyntheticEvent): void;
-// }
-type ReactEvent = (e: BaseSyntheticEvent) => void;
 
 const SignUp = () => {
   // const { data, error, revalidate } = useSWR('/api/users', fetcher);
@@ -27,23 +29,31 @@ const SignUp = () => {
   const [signUpError, setSignUpError] = useState('');
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const onChangePassword: EventHandler = useCallback(
+  const onChangePassword: ChangeEventHandler = useCallback(
     (e) => {
-      setPassword(e.target.value);
-      setMismatchError(e.target.value !== passwordCheck);
+      // setPassword(e.target.value);
+      // setMismatchError(e.target.value !== passwordCheck);
+
+      const target = e.target as HTMLInputElement;
+      setPassword(target.value);
+      setMismatchError(target.value !== passwordCheck);
     },
-    [passwordCheck],
+    [passwordCheck, setPassword],
   );
 
-  const onChangePasswordCheck: ReactEvent = useCallback(
+  const onChangePasswordCheck: ChangeEventHandler = useCallback(
     (e) => {
-      setPasswordCheck(e.target.value);
-      setMismatchError(e.target.value !== password);
+      // setPasswordCheck(e.target.value);
+      // setMismatchError(e.target.value !== password);
+
+      const target = e.target as HTMLInputElement;
+      setPasswordCheck(target.value);
+      setMismatchError(target.value !== password);
     },
-    [password],
+    [password, setPasswordCheck],
   );
 
-  const onSubmit: ReactEvent = useCallback(
+  const onSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault();
       if (!mismatchError && nickname) {
@@ -68,7 +78,8 @@ const SignUp = () => {
           .finally(() => {});
       }
     },
-    [email, nickname, password, passwordCheck, mismatchError],
+    [email, nickname, password, mismatchError],
+    // [email, nickname, password, passwordCheck, mismatchError],
   );
 
   if (data === undefined) {
