@@ -3,7 +3,7 @@ import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } fro
 import { User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import axios, { AxiosError } from 'axios';
-import React, { FormEventHandler, MouseEventHandler, useCallback, useState } from 'react';
+import React, { FormEvent, FormEventHandler, MouseEventHandler, UIEventHandler, useCallback, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // npm i @tanstack/react-query
@@ -37,7 +37,7 @@ const LogIn = () => {
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('qwer@qwer.qwer');
   const [password, onChangePassword] = useInput('qwer');
-  const onSubmit: FormEventHandler<HTMLFormElement> = useCallback(
+  const onSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault();
       mutation.mutate({ email, password });

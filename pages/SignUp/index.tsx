@@ -1,6 +1,6 @@
 import useInput from '@hooks/useInput';
 // import fetcher from '@utils/fetcher';
-import React, { BaseSyntheticEvent, useCallback, useState, VFC } from 'react';
+import React, { BaseSyntheticEvent, EventHandler, useCallback, useState, VFC } from 'react';
 import axios from 'axios';
 // import useSWR from 'swr';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from './styles';
@@ -27,7 +27,7 @@ const SignUp = () => {
   const [signUpError, setSignUpError] = useState('');
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const onChangePassword: ReactEvent = useCallback(
+  const onChangePassword: EventHandler = useCallback(
     (e) => {
       setPassword(e.target.value);
       setMismatchError(e.target.value !== passwordCheck);
