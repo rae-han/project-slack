@@ -162,165 +162,188 @@ https://github.com/ZeroCho/sleact
     
 
 # 2챕터
-dotenv 웹팩에서
-공통된 코드 조각은 모듈화하는게 좋다. 훅도 반복되면 커스텀 훅으로 빼줘서 반복을 줄여주는 것이 좋다. 다만 확신이 없을 경우 섣부르게 하지말고 충분히 코드를 완성한 후 비교해서 하는 것도 좋은 방법이다.
-초기 값은 조건문을 생각하면 null, false, 빈 문자열이 편리하다.
-비동기 통신할때 에러 같은 경우에는 초기화 먼저 해주고 에러가 나면 에러를 넣어주는 것이 좋다.
-비동기 요청 단계 = 요청(loading) -> 응답(success, failure) 총 3단계
-a태그를 쓰면 새로고침 되기때문에 spa을 사용하는 장점이 없어진다. react-router-dom 의 Link태그를 이용하면 된다. 만약 이 태그를 사용법을 모르겠다면 문서를 보는 방법도 있지만 타입스크립트의 장점 중 하나로 속성 값을 볼수 있다.
-react-router v5 -> v6 가 되면서 Redirect 컴포넌트 대신 Navigate 컴포넌트를 쓰도록 바꼈다.
-로그인 상태를 풀려면 백엔드를 로컬호스트로 돌릴때 대부분 로그인된 사용자의 정보를 메모리에 가지고 있기 때문에 껏다 켜면 다 날아가서 풀린다. 또는 쿠키를 삭제한다.
-즉 로그아웃 하려면 코드에서 쿠키를 날리면 된다?
-CORS 에러가 뜰때 프론트에서 프록시를 사용하는 방법도 있지만, 백엔드에서 해결해주는 방법도 있다. 
-그럴 경우 옵션즈라는 요청이 하나 더 가는데  
-로그인을 성공한 상태면 서버에서 데이터를 주는데 그걸 가지고 로그인 유무를 판단하면 된다. 그걸 저장하고 있으려면 전역 스테이트인 리덕스가 필요하다.
-리덕스를 떼내려면?? contextAPI, SWR, react-query
-SWR는 요청을 보내서 받아온 데이터를 저장을 해둔다.
-요청은 보통 get이다. post를 못쓰는건 아닌데 보통은 get요청에 대한 응답을 저장하고 있는다.
-그냥 post 날리고 get 요청 한번 더 날리면 된다.
-swr은 next만든 곳에서 만든 라이브러리.
+- .env 설정
+    - webpack.config.ts 에서 dotenv 라이브러리를 사용해 config 함수를 실행시켜주면 된다. 그 후 config.plugins에서 Webpack의 DefinePlugin을 사용해 process.env를 전역에서 접근할 수 있도록 설정한다.
+    - CRA를 사용할 때랑 다르게 접두사로 REACT_APP_ 을 안붙여도 된다.
 
-```markdown
-npm i @tanstack/react-query @tanstack/react-query-devtools
-```
-```typescript jsx
-// client.tsx
-import React from 'react';
-// import { render } from 'react-dom';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+        ```tsx
+        import dotenv from 'dotenv';
+        dotenv.config();
+        ```
 
-import App from './layouts/App';
+        ```tsx
+        plugins: [
+        	// ..
+          new webpack.DefinePlugin({
+            'process.env': JSON.stringify(process.env),
+          }),
+        ],
+        ```
 
-const container = document.querySelector('#app');
-const root = createRoot(container!); // createRoot(container!) if you use TypeScript
+    - 추가로 dotenv-webpack 패키지를 사용하면 더 간단하게 할 수 있다.
 
-const queryClient = new QueryClient();
+        ```tsx
+        import Dotenv from 'dotenv-webpack';
+        
+        plugins: [
+        	// ..
+          new Dotenv(),
+        ],
+        ```
 
-root.render(
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-    <ReactQueryDevtools initialIsOpen={false} />
-  </QueryClientProvider>,
-);
-```
+- 공통된 코드 조각은 모듈화 하는 것이 좋다. 훅도 같은 로직으로 반복되면 커스텀 훅으로 모듈화하여 반복을 줄여주는 것이 좋다. 다만 확신이 없을 경우 먼저 모듈화 하지 말고 중복 되더라도 충분히 코드를 완성한 후 모듈화 하는 것도 좋은 방법이 될 수 있다.
+- 초기 값은 조건문에 사용하게 될수 있을 경우까지 생각하여 null, false, 빈문자열로 하면 편리하다.
+- 비동기 통신시 바뀌는 값(setState)은 통신 직전에 초기화를 먼저 해주는 것이 좋다.
+    - 비동기 요청 단계는 총 3단계인데(요청(loading) → 응답(success, failure)), 만약 여러 요청을 연달아 날릴 때 첫번째 요청때 남아있던 결과가 두번째 요청때 그대로 남아있는 문제가 있다.
+    - 각 요청 별로 결과를 보여주려면 요청 보내기 전에 값을 초기화 시켜주면 된다.\
+- a태그를 쓰면 페이지가 새로고침 되기 때문에 SPA를 사용하는 장점이 없어진다. react-router-dom의 Link 태그를 사용하면 된다.
+    - 그리고 만약 이런 외부 라이브러리의 태그 사용법을 모르겠다면 해당 라이브러리의 문서를 보는 방법도 있지만, 타입스크립트의 장점 중 하나로 해당 태그(또는 함수)의 속성 값을 볼수 있다.
+- react-router의 버전이 5에서 6으로 바뀌면서 Redirect 컴포넌트 대신 Navigate 컴포넌트를 사용하면 된다. 자세한 변경점은 아래 링크에 다시 정리 했다.
 
-로그인은 쿠키로 하는데 프론트랑 백 주소가 다르면 쿠키가 전달이 안된다.
-이걸 해결해주는 것이 axios 설정의 widthCredentials: true
-쿠키는 백엔드에서 생성해서 프론트엔드 브라우저가 기억하게 하고 
-프론트엔드가 기억한 쿠키를 매 요청마다 보내준다.
+  [React Router v5 vs v6](https://www.notion.so/React-Router-v5-vs-v6-59ab335118b14c9fb33f83c612adc620)
 
-근데 만약 프록시를 사용하면? 주소가 같기 때문에 문제가 안된다.
+- 로그인 상태를 풀려면 백엔드를 로컬 호스트로 돌릴 경우 대부분 로그인된 사용자의 정보를 메모리에 가지고 있기 때문에 서버를 껏다 켜면 다 날아가서 풀린다. 또는 개발자 도구의 Application 탭에서 쿠키를 삭제하여 서버의 세션(메모리)를 참조 못하게 하는 방법도 있다.
+    - 같은 원리로 로그아웃을 하려면 쿠키를 날려버리면 된다.
+- CORS 에러가 뜬다면 프론트에서 프록시를 사용하는 방법도 있지만, 백엔드에서 cors 같은 패키지를 이용하여 허용해주는 방법도 있다.
+    - 백엔드에서 허용해줄 경우 options 메소드 요청이 수행해야 할 요청 전에 하나 더 가는데, 서버로 요청을 미리 보내보고 해당 응답을 확인한 후 요청이 허용된다면 원 요청을 수행한다.
+    - 이를 pre-flight 절차라 한다.
+- 로그인을 성공한 상태면 서버에서 데이터를 주는데 그 데이터를 가지고 로그인 유무를 판단하면 된다. 그걸 저장하고 있으려면 전역 스테이트를 사용하면 되는데 리덕스 같은 라이브러리를 이용하면 된다.
+  만약 리덕스를 프로젝트에서 떼어내고 싶다면 contextAPI, SWR, react-query 같은 라이브러리를 사용하면 된다.
+- swr는 요청을 보내고 응답 받은 데이터를 저장해둔다.
+    - swr의 요청은 보통 get을 의미한다. post 같은 다른 메소드를 사용하지 못하는 것은 아닌데, 보통은 get 요청에 대한 응답을 저장하고 있는다.
+- 만약 post로 로그인 요청을 하고 유저 정보를 받아오고 싶다면 그냥 get 요청을 한번 더 하면 된다.
+- 참고로 swr은 nextjs을 만든 Vercel에서 만든 라이브러리다.
+- 나는 swr과 react-query 두가지 방법 모두 사용해 봤다. react-query의 기본 세팅은 아래와 같다.
 
-배포 시 프록시 개념은 쓰이지만 실제 개발 환경처럼 webpack에서 proxy 옵션을 쓰진 않는다.
+    ```tsx
+    npm i @tanstack/react-query @tanstack/react-query-devtools
+    ```
 
-화면에 반영되는 데이터는 useState, 반영되지 않는 데이터느 useRef
+    ```tsx
+    // client.tsx
+    import React from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { BrowserRouter } from 'react-router-dom';
+    import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+    import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+    
+    import App from './layouts/App';
+    
+    const container = document.querySelector('#app');
+    const root = createRoot(container!); // createRoot(container!) if you use TypeScript
+    
+    const queryClient = new QueryClient();
+    
+    root.render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>,
+    );
+    ```
 
-useState를 안쓰고 그냥 let으로 변수 선언해서 쓰면 
-함수형 컴포넌트 기준으로 함수 안에 있다면 리렌더링 될 때 데이터가 초기화 되는 문제가 있고
-함수 밖에 있다면 해당 데이터를 사용하는 컴포넌트가 재활용 됐을때 각각의 데이터를 갖는게 아닌 전역처럼 각 컴포넌트가 하나의 데이터를 바라보고 있는다.
+- 로그인은 쿠키로 하는데 클라이언트와 서버 주소가 다르면 쿠키가 전달이 안된다. 이를 해결하려면 axios 설정에서 widthCredentials  값을 true 로 해주면 된다.
+    - 쿠키는 백엔드 서버에서 생성하여 프론트엔드 브라우저가 기억하게 하고, 프론트엔드가 기억한 쿠키를 매 요청마다 보내준다.
+    - 근데 만약 프록시를 사용 중이라면? 주소가 같기 때문에 문제가 안된다.
+- 배포 시 프록시 개념은 쓰이지만 실제 개발 환경처럼 webpack의 proxy 옵션을 쓰진 않는다.
+- 화면에 반영되는 데이터는 useState, 반영되지 않는 데이터는 useRef를 사용하면 된다. 마찬가지로 useCallback은 함수를 메모이제이션, useMemo는 값을 메모이제이션한다. 잘 구분하여 사용하자.
+- useSatate를 안쓰고 그냥 let으로 변수 선언해서 사용하지 않는 이유는 함수형 컴포넌트 기준으로
+  함수 안에 변수가 있다면 리렌더링 될 때 데이터가 초기화 되는 문제가 있고,
+  함수 밖에 있다면 해당 데이터를 사용하는 컴포넌트가 중복되어 사용 됐을때, 각각의 데이터를 갖는 것이 아닌 전역처럼 각 컴포넌트가 하나의 데이터를 바로보고 있는다.
+- swr 사용할 때 요청이 너무 자주가는게 걱정된다면? 설정 가능하다.
+    1. 어떤 상황에서 실행시켜 줄 것인지.
+    2. 요청 주기를 어떻게 가져갈 것인지.
+- swr의 revalidate 함수를 호출하면, 요청을 수동으로 실행시켜 줄 수 있다.
+- 추가로 dedupingInterval을 설정하면 그 전과 같이 주기적으로 호출은 되지만 설정한 밀리초 동안은 캐시에서 불러온다.
+- children을 쓰는 타입은 React.FC, 안쓰는 타입은 React.VFC를 쓰면 된다.
+    - 근데 react 18 버전 부터는 FC를 써도 명시적으로 작성해줘야 하는것 같다. - ?
 
-SWR 사용할 때 요청이 너무 자주가는게 걱정된다면? 설정 가능하다.
-첫번째는 어떤 상황에서 실행시켜 줄 것인지.
-두번째는 요청 주기를 어떻게 가져갈 것인지.
-revalidate - 성공했을때 이 함수를 호출해주면 로그인 성공 했을 때 함수를 실행시켜준다.
-rq에서는 onSuccess로 구현 하면 된다.
-dedupingInterval - 그 전과 같이 주기적으로 호출은 되지만 이 시간 동안은 캐시에서 불러온다.
+        ```tsx
+        import * as React from 'react';
+        
+        type Props = {
+          children?: React.ReactNode
+        };
+        const Component: React.FC<Props> = ({children}) => { /** ... */ }
+        ```
 
-children을 쓰는 타입은 React.FC 안쓰는 타입은 React.VFC를 쓰면 된다.
-그런데 18버전부터는 FC를 써도 명시적으로 작성해줘야 하는것 같다.
-```typescript
-import * as React from 'react';
+- swr을 이용하여 로그인을 할 때, 로그인 요청을 한 후 then 문에서 응답 받았다면 revalidate를 사용해서 유저 정보를 불러온다면 초기 렌더링 때와 응답 받았을 때 revalidate 함수를 통해 총 2번 요청하게 된다.
+- 이때 swr의 mutate 함수를 하용할 수 있다.
+    - revalidate는 서버로 요청을 다시 해서 데이터를 가져오는 것
+    - mutate는 서버에 요청 안보내고 데이터를 수정하는 것
+    - 다만 최신 swr 버전 2.0.3 에서는 revalidate 함수를 반환하지 않는다. mutate를 사용해야 하는 것 같다.
+    - 예를 들면 login 요청을 했을 때 login 요청에 대한 응답 값으로 유저 정보가 들어있는 경우, 굳이 다시 유저 정보를 다시 서버에 요청하는 것이 아닌 응답 받은 값을 mutate를 이용하여 유저 정보에 넣어준다.
+        - 참고로 위와 같은 방법을 사용해도 정보를 넣어준 뒤 서버와 통신하여 한번 더 맞는지 확인하는 과정을 거친다.
+        - 만약 한 번 더 맞는지 확인하는 과정도 없애 서버 부하를 줄이고 싶다면 두 번째 인자인 shouldRevalidate 값으로 false를 주면 된다.
+        - 이 방법을 사용하여 로그아웃 같은 경우 mutate 함수로 유저 정보에 false를 넣어주어(서버에 유저 정보 요청을 실패했을 때 받는 값)  구현 가능하다.
+- swr을 사용할 때 useSWR 함수에 대한 반환 값인 mutate 대신 라이브러리 자체 mutate 함수를 가져올 수도 있는데 이것은 범용적으로 사용할 수 있다.
+    - 다만 useSWR의 반환 값으로 나오는 mutate 함수는 어떤 데이터를 바꿔야 할지 키를 가지고 있지만, 전역 mutate 함수 같은 경우 key(useSWR의 url)를 명시해줘야한다.
+- 전역(범용) mutate가 유용할 때가 있는데, 만약 특정 컴포넌트에서 useSWR 함수를 통해 한번의 요청도 하기 싫지만 mutate를 통해 데이터를 다시 받아오고 싶을 때이다.
+    - 예를 들면 로그인 하면 유저 정보는 필요한 곳에서는 useSWR을 선언하여 받아오고, 이 요청만 다른 곳에서 한번 더 하고 싶다면 굳이 useSWR로 mutate를 불러오는 것이 아닌 전역 mutate와 url을 키로 사용하여 요청을 보내면 된다.
+      다만 대부분의 경우 굳이 사용할 필요가 없다.
+- mutate를 사용할 때 서버와 통신 전에 미리 클라이언트에 반영을 해주기 때문에 사용성(사용자 경험?)이 좋아 진다.
+    - 사용자 입장에서는 바로바로 반응이 온다 느낀다.
+    - 가끔 서버 에러로 클라이언트 값과 서버 값이 다를 수 있는데 이를 위해서 점검을 해주는 것이다. 이때 취소를 하면 된다.
+    - 이런 기술을 Optimistic UI(낙관적 UI)라 부른다.
+    - 반대의 경우 먼저 실패할 것이라 생각하고 개발하는 걸 비관적 UI(Pessimistic UI)라 한다.
 
-type Props = {
-  children?: React.ReactNode
-};
-const Component: React.FC<Props> = ({children}) => { /** ... */ }
-```
+        <aside>
+        💡 정리
+        기본적으로 서버에 요청한 후 성공이 확실할 때만 데이터를 업데이트 해주는 것을 Pessmistic UI,
+        mutate를 이용하여 서버 요청 전 데이터를 업데이트를 해주고 옵션인 shouldRevalidate 값을 true 로 하여 요청에 대한 응답으로 데이터 정합성을 맞춰보는 것을 Optimistic UI,
+        mutate를 사용하되 shouldRevalidate 값이 false 라면 서버에 요청조차 보내지 않는다.
 
-SWR을 이용하여 로그인을 하면 로그인 요청을 한 후 then문에서 
-revalidate를 하여 유저 정보를 한번 요청하여 2번 요청 한다.
-이때 mutate를 사용할 수 있다.
-revalidate는 서버로 요청을 다시 해서 데이터를 다시 가져오는 것
-mutate는 서버에 요청 안보내고 데이터를 수정하는 것
+        </aside>
 
-예를들면 login 요청을 했을 때 이미 응답 값에 유저 정보가 있다.
-이럴때는 다시 요청을 보내는 것이 아닌 mutate 함수에 데이터로 이 정보를 넣어줘서 
-데이터를 넣어준다.
-이걸 쓰려면 서버와 약속이 돼야할듯?
-참고로 이렇게 해도 정보를 넣어준 뒤 서버와 통신하여 한번 더 맞는지 확인을 하는데
-이 요청 자체를 없애서 서버 부하를 줄이고 싶다면 두번째 인자인 shouldRevalidate 값으로 false를 주면 된다.
+- 같은 url(ex. /api/user)을 통해 요청하는 useSWR 함수가 곳곳에 있다면 요청이 너무 많이 가지 않을까??
+    - 걱정 안해도 되는게 dedupingInterval에서 설정한 캐시 유지 시간 만큼 요청수가 아무리 많아도 서버에 한번만 요청하고 나머지 요청에는 첫번째 요청에 대한 캐시된 응답을 가져온다.
+- swr 대신 graphQL에서 사용하는 appollo나 react-query, rtk 같은 라이브러리도 같은 기능이 있다.
+- useSWR 함수를 사용할 때 fetch 함수로 get 메서드 뿐 아니라 post 메서드도 사용가능한데, 사실 데이터를 가져온다는 것은 변하지 않는다. 만약 post 함수에서 리턴된 값이 있다면 그 값을 가져온다.
+- 또한 swr은 비동기 요청에만 국한된 라이브러리가 아니다. 아래와 같은 코드로 localStorage 값을 쓰거나 불러올 수 있다.
 
-로그아웃 같은 경우에는 false를 넣어주면 된다.
-이유가 있는 것이 아니고 기준에 유저 정보가 없으면 false 값이 응답으로 왔었다.
+    ```tsx
+    const {data} = useSWR('hello', (key) => {
+      localStorage.setItem('data', key);
+      return localStorage.getItem('data');
+    })
+    ```
 
-useSWR에서 구조분해할당 하지 않고 swr 라이브러리를 import 할때 metate를 가져올 수도 있는데
-이건 범용적으로 사용하는 함수이다.
-이 mutate는 key, data를 받는데 key는 useSWR 중 하나의 url을 적어주면 그것과 연결된다.
+- 참고로 위 코드를 이해하면 swr를 전역 데이터 관리자로 사용할 수 있다. 위 코드를 이용하여 아래 코드로 다른 곳에서 데이터를 불러올 수 있다.
 
-mutate를 사용하면 서버와 통신 전 이미 클라이언트에 바로 반영을 해주기 때문에
-사용성이 엄청 좋아진다.
-사용자 입장에서는 바로바로 반응이 된다 생각해서
-가끔 서버 에러가 터지는데 그래서 점검을 해주는 것 이때 취소를 해주면 된다.
-이걸 optimistic ui라 한다.
+    ```tsx
+    const {data} = useSWR('hello');
+    ```
 
-반대로 먼저 실패했을거라고 하는걸 비관적 ui (패시미스틱 ui)라 한다.
-
-한마디로 기본적으론 패시미스틱 ui
-shouldRevalidate가 true 면 optimistic ui
-shouldRevalidate가 false 면 서버에 요청조차 안한다.
-
-전역 mutate가 유용할 때는??
-만약 useSWR을 통해 한번의 요청도 하기 싫지만 mutate를 통해서 데이터를 다시 받아오고 싶을 때
-예를 들면 로그인 하면 유저 정보는 필요한 곳에서만 useSWR을 선언해서 받아오고
-이 요청을 다른 곳에서 한번 더 하고 싶다면 굳이 useSWR로 mutate를 불러오는 것이 아닌
-전역 mutate와 url를 키로 요청을 보내면 된다.
-대부분의 경우는 굳이 사용할 필요 없다.
-
-/api/users 가 곳곳에 있다면 요청이 너무 많이 가지 않을까??
-걱정 안해도 되는게 dedupingInterval에서 설정한 캐시 유지 시간 만큼 요청수가 아무리 많아도
-서버에 한번만 요청하고 나머지 요청에는 첫번째 요청에 대한 캐시된 요청에 대한 응답을 가져온다.
-
-graphQL이면 appollo? react-qeury도 같은 기능 있다.
-
-useSWR을 사용할 때 get뿐 아니라 post도 사용한다.
-사실 데이터를 가져온다는 것은 변하지 않는다.
-
-또한 swr은 비동기 요청에만 국한된 라이브러리가 아니다.
-```typescript
-const {data} = useSWR('hello', (key) => {
-  localStorage.setItem('data', key);
-  return localStorage.getItem('data');
-}
-```
-이런 식으로 localStorage 값을 불러올 수 있다.
-
-저걸 알아야 SWR을 전역 데이터 관리자로 사용할 수 있다.
-다른 곳에서는 아래와 같이 데이터를 불러올 수 있다.
-```typescript
-const {data} = useSWR('hello');
-```
-
-서버 센트 이벤트처럼 계속 주기적으로 받는 이벤트도 계속 뮤데이트로 집어넣으면 된다.
-받을때마다 뮤테이터로 집어넣고 다른데서 서버 센트 이벤트로 받은 데이터 갖다 쓴다.
-
-React.memo는 hooks 나왔다고 사라지는 것이 아니라 많이 쓰인다.
-보통 말단 컴포넌트들은 메모 붙여주면 최적화 잘 된다.
-props쪽 최적화이다.
-
-그래서 fetcher를 다양하게 만들면 좋다.
-서버에서만 받는게 아니라 다른 데서도 받을 수 있고
-또는 리턴 값에서 값을 변형시켜서 사용해도 된다. 즉 서버쪽에서 받는 데이터를 변형하여 사용할 수 있다.
-
-같은 주소인데 두가지의 패처를 쓰고 싶다면??
-꼼수가 있는데 url에 쿼리 스트링 (?) 또는 샆(#) 붙이면 된다.
-서버는 # 무시하는데 키가 다르다 생각한다.
-
-툴킷을 사용하면 굳이 안써도 되는
+- SSE(server sent events)처럼 계속 주기적으로 받는 이벤트도 뮤테이트로 집어 넣으면 된다. 받을때마다 뮤테이트로 데이터를 갱신하고, 다른 곳에서 SSE로 받은 이벤트로 받은 데이터를 갖다 쓴다.
+- 위 같은 경우를 포함하여 요청을 할 때 사용하는 fetcher 함수는 다양하게 만들면 좋다. 서버뿐 아니라 다른 곳에서 데이터를 받을 수 있을뿐 아니라, 서버쪽에서 온 응답 값을 클라이언트에 맞게 변형하여 반환할 수도 있다.
+- 만약 같은 주소라면 swr에서는 같은 키의 요청인 것인데 다른 fetcher 함수를 사용하고 싶다면, 꼼수가 있는데 url을 키로 인식하기 때문에 요청에 영향이 없게 조금 바꿔주면 된다.
+    - url에 쿼리 스트링(?) 또는 #을 붙이면 된다.
+    - 서버는 #을 무시하지만 swr에서는 다른 키라고 인식된다.
+- swr를 react-query로 바꾼다면 아래와 같은 내용이 바뀐다.
+    - useQuery(useSWR 대체)
+        - 반환 값
+            - data는 성공 시 반환되는 값
+            - error는 실패 시 반환되는 값
+            - isLoading과 isError는 요청 중, 요청 실패 상태를 알려주는 값
+        - 옵션
+            - staleTime 으로 캐시 시간을 설정
+    - 다른 곳에서 캐싱 된 데이터를 가져 오려면 useQuery 대신 useQueryClient에서 반환된 queryClient를 사용.
+    - useMutation
+        - 요청을 날리는 함수인 mutate 함수를 반환하는 함수.
+        - swr의 revalidate대신 rq에서는 invalidateQeuries와 키로 데이터를 무효화 시켜 서버에서 데이터를 다시 받아오게 한다.
+        - swr에서 mutate를 사용해 낙관적 업데이트를 rq에서는 아래와 같이 구현 가능하다.
+            1. onMuate 메서드는 mutate 함수를 호출 했을때 useMutation의 QueryFn이 호출 되기 전에 실행되는데 cancelQuery를 실행하여 혹시 발생할지 모르는 refetch를 취소하여 Optimistic Update의 데이터를 덮어쓰지 않도록 예방한다.
+            2. getQueryData를 실행 시켜 이전 데이터를 불러와 변수에 저장하는데 요청이 실패했을 경우 이전 데이터를 다시 사용하기 위함이다.
+            3. setQueryData와 요청시 사용하는 키를 조합하여 서버의 응답이 오기 전에 UI를 미리 업데이트 해준다.
+            4. 에러가 발생할 경우를 대비해 2번에서 저장한 데이터를 리턴해준다. 이 값은 onError 메서드의 context에 들어간다. 에러가 발생한다면 onError 메서드 내부에서 setQueryData를 사용해 이 전 데이터로 되돌리면 된다.
+            5. onSettled는 요청 후(성공, 실패) 발생하는데 invalidateQueries를 사용하여 현재 요청 쿼리키를 갖는 쿼리를 무효화 시키고 refetch를 하여 데이터를 서버와 일치 시킨다.
+    - 요청 성공 시 onSuccess에 있는 로직이 실행 된다.
+- React.memo는 hooks 나왔다고 사라지는 것이 아니라 많이 쓰인다.
+    - 보통 말단 컴포넌트들은 메모 붙여주면 최적화 잘 된다.
+    - props쪽 최적화이다.
+    - 참고로 웬만하면 React.memo랑 useCallback은 쓰도록 하자. 일치 연산자 비교를 하기 때문에 드는 비용이 0이나 다를바 없기 때문이다.([https://attardi.org/why-we-memo-all-the-things/](https://attardi.org/why-we-memo-all-the-things/))
 
 
 

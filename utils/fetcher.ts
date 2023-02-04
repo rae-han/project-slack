@@ -9,6 +9,8 @@ type CustomFetcher = (queryKey: string | QueryOptions) => void;
 const fetcher = async ({ queryKey }: { queryKey: string }) => {
   // let url = queryKey;
 
+  console.log('QK', queryKey);
+
   const response = await axios.get(queryKey, {
     withCredentials: true,
   });
