@@ -1,5 +1,5 @@
 import { Button, Input, Label } from '@pages/SignUp/styles';
-import { IChannel, User } from '@typings/db';
+import { Channel, User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { VFC, useCallback, useState, useEffect } from 'react';
@@ -35,10 +35,14 @@ import {
   WorkspaceWrapper,
 } from '@layouts/Workspace/styles';
 
-const Channel = loadable(() => import('@pages/Channel'));
+const ChannelPage = loadable(() => import('@pages/Channel'));
 // const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
-const Workspace: VFC = () => {
+interface Props {
+  children?: React.ReactNode;
+}
+
+const Workspace: React.FC<Props> = ({ children }) => {
   const queryClient = useQueryClient();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);

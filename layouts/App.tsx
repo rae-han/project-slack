@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import loadable from '@loadable/component';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,7 +13,7 @@ const SignUp = loadable(() => import('@pages/SignUp'));
 // const SignUp = React.lazy(() => import('@pages/SignUp'));
 const Channel = loadable(() => import('@pages/Channel'));
 
-const App: FC = () => {
+const App: React.FC = () => {
   return (
     <Routes>
       <Route path="" element={<Navigate replace to="/login" />} />

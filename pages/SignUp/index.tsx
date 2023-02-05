@@ -29,14 +29,14 @@ const SignUp = () => {
   const [signUpError, setSignUpError] = useState('');
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const onChangePassword: ChangeEventHandler = useCallback(
+  const onChangePassword: ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
-      // setPassword(e.target.value);
-      // setMismatchError(e.target.value !== passwordCheck);
+      setPassword(e.target.value);
+      setMismatchError(e.target.value !== passwordCheck);
 
-      const target = e.target as HTMLInputElement;
-      setPassword(target.value);
-      setMismatchError(target.value !== passwordCheck);
+      // const target = e.target as HTMLInputElement;
+      // setPassword(target.value);
+      // setMismatchError(target.value !== passwordCheck);
     },
     [passwordCheck, setPassword],
   );
