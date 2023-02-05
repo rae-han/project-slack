@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import loadable from '@loadable/component';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+import Workspace from '@layouts/Workspace';
 
 // import LogIn from '@pages/LogIn';
 // import SignUp from '@pages/SignUp';
@@ -12,6 +12,7 @@ const SignUp = loadable(() => import('@pages/SignUp'));
 // 에디터 같은건 서버에서 렌더링 할 필요 없다. 서버에서 렌더링 안되게 코드스플리팅 해둔다.
 // const SignUp = React.lazy(() => import('@pages/SignUp'));
 const Channel = loadable(() => import('@pages/Channel'));
+const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
 const App: React.FC = () => {
   return (
@@ -20,7 +21,9 @@ const App: React.FC = () => {
       {/*<Route path="/" element="/login" />*/}
       <Route path="/login" element={<LogIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/workspace/channel" element={<Channel />} />
+      <Route path="/workspace/*" element={<Workspace />} />
+      {/*<Route path="/workspace/channel" element={<Channel />} />*/}
+      {/*<Route path="/workspace/dm" element={<DirectMessage />} />*/}
     </Routes>
   );
 };

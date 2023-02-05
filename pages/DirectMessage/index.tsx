@@ -1,12 +1,12 @@
 import React from 'react';
 import { Container } from './styles';
 
-const Channel = () => {
+const DirectMessage = () => {
   return (
     <Container>
-      <div>환영!</div>
+      <div>direct message</div>
     </Container>
   );
 };
 
-export default Channel;
+export default DirectMessage;

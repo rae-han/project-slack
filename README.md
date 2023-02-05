@@ -346,7 +346,31 @@ https://github.com/ZeroCho/sleact
     - 참고로 웬만하면 React.memo랑 useCallback은 쓰도록 하자. 일치 연산자 비교를 하기 때문에 드는 비용이 0이나 다를바 없기 때문이다.([https://attardi.org/why-we-memo-all-the-things/](https://attardi.org/why-we-memo-all-the-things/))
 
 
+# 3
+npm i gravatar @types/gravater
+반드시 라이브러리를 설치할 때 @types/라이브러리 를 해야하는 것은 아니다.
+redux같은건 ts로 이미 만들어졌는데 이런건 그냥 설치하고
+dt로 돼 있는건 자바스크립트로 만들어졌지만 타입을 알려주는 d.ts파일이 있는 것이다.
+보통 @types, d.ts는 라이브러리 만든 사람이 만든 것이 아닌 다른 사람이 만들었을 가능성이 높다.
+가끔 타입이 잘못되거나 없는 경우가 있는데 그때는 직접 타이핑해야한다.
+그건 typings에 하자.
+스타일드 컴포넌트는 내가 만들면 뭔지 알아도 다른 사람이 만든 걸 분석할 때 힘들수 있다.
+그래서 모든 컴포넌트로 하면 구조 파악이 힘들므로 큼직한 단위를 스타일드 컴포넌트로 만들고
+그 안에 것은 그냥 css로
 
+리액트 라우터 구조
+가장 상위 App - 라우팅을 한다.
+라우팅 되는 컴포넌트들은 보통 페이지
+페이지 안에 레이아웃 - 보통 공통된 부분을 레이아웃으로 뺀다. 헤더, 사이드 메뉴
+channel과 dm 모두 workspace 레이아웃을 공유하기 때문에
+각 페이지마다 레이아웃을 사용하고 children을 사용하는 방법도 있지만
+워크스페이스에서 Routes Route를 사용하는 방법도 있다.
+이때 메인 라우터인 App에서는 workspace만 등록 해두 안에서 다시 분기하면 된다.
+주의할 점은 공통 주소인 workspace는 같아야하고 계층적인 구조를 가져야한다. (ex. Workspace.tsx - /workspace/dm, /workspace/channel)
+아니라면 렌더링이 안된다.
+
+둘 중 선택을 하는 방법은 주소가 일관성 있으면 네스트 라우터를 사용하면 괜찮고
+그게 아니라면 각각 페이지에서 레이아웃을 감싸는 방법이 좋다.
 
 
 

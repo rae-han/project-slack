@@ -2,12 +2,12 @@ import { Button, Input, Label } from '@pages/SignUp/styles';
 import { Channel, User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { VFC, useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate, useParams } from 'react-router';
 import { Link, Routes, Route } from 'react-router-dom';
 import loadable from '@loadable/component';
-// import gravatar from 'gravatar';
+import gravatar from 'gravatar';
 // import { toast } from 'react-toastify';
 // import CreateChannelModal from '@components/CreateChannelModal';
 // import ChannelList from '@components/ChannelList';
@@ -36,6 +36,7 @@ import {
 } from '@layouts/Workspace/styles';
 
 const ChannelPage = loadable(() => import('@pages/Channel'));
+const DirectMessagePage = loadable(() => import('@pages/DirectMessage'));
 // const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
 interface Props {
@@ -167,23 +168,23 @@ const Workspace: React.FC<Props> = ({ children }) => {
             {/*        <span id="profile-active">Active</span>*/}
             {/*      </div>*/}
             {/*    </ProfileModal>*/}
-            {/*    <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>*/}
+            <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
             {/*  </Menu>*/}
             {/*)}*/}
           </span>
         </RightMenu>
       </Header>
       <WorkspaceWrapper>
-        {/*<Workspaces>*/}
-        {/*  {userData?.Workspaces.map((ws) => {*/}
-        {/*    return (*/}
-        {/*      <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>*/}
-        {/*        <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>*/}
-        {/*      </Link>*/}
-        {/*    );*/}
-        {/*  })}*/}
-        {/*  <AddButton onClick={onClickCreateWorkspace}>+</AddButton>*/}
-        {/*</Workspaces>*/}
+        <Workspaces>
+          {/*  {userData?.Workspaces.map((ws) => {*/}
+          {/*    return (*/}
+          {/*      <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>*/}
+          {/*        <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>*/}
+          {/*      </Link>*/}
+          {/*    );*/}
+          {/*  })}*/}
+          {/*  <AddButton onClick={onClickCreateWorkspace}>+</AddButton>*/}
+        </Workspaces>
         <Channels>
           <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
           <MenuScroll>
@@ -200,10 +201,12 @@ const Workspace: React.FC<Props> = ({ children }) => {
           </MenuScroll>
         </Channels>
         <Chats>
-          {/*<Switch>*/}
-          {/*  /!*<Route path="/workspace/:workspace/channel/:channel" component={Channel} />*!/*/}
-          {/*  <Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />*/}
-          {/*</Switch>*/}
+          <Routes>
+            {/*<Route path="/workspace/:workspace/channel/:channel" component={Channel} />*/}
+            <Route path="/channel" element={<ChannelPage />} />
+            {/*<Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />*/}
+            <Route path="/dm" element={<DirectMessagePage />} />
+          </Routes>
         </Chats>
       </WorkspaceWrapper>
       {/*<Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>*/}
