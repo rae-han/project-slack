@@ -34,6 +34,8 @@ const LogIn = () => {
     },
   );
 
+  type SubmitEventHandler = FormEventHandler<HTMLFormElement> | MouseEventHandler<Element>;
+
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('qwer@qwer.qwer');
   const [password, onChangePassword] = useInput('qwer');
@@ -45,6 +47,7 @@ const LogIn = () => {
     [email, password, mutation],
   );
 
+  console.log(onSubmit);
   if (isLoading) {
     return <div>로딩중...</div>;
   }
