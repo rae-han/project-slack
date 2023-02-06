@@ -2,7 +2,7 @@ export interface User {
   id: number;
   nickname: string;
   email: string;
-  // Workspaces: IWorkspace[];
+  Workspaces: Workspace[];
 }
 
 export interface UserWithOnline extends User {
@@ -38,7 +38,7 @@ export interface IDM {
   createdAt: Date;
 }
 
-export interface IWorkspace {
+export interface Workspace {
   id: number;
   name: string;
   url: string; // 주소 창에 보이는 주소

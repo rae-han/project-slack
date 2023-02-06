@@ -2,20 +2,20 @@ import { Button, Input, Label } from '@pages/SignUp/styles';
 import { Channel, User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, MouseEventHandler } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate, useParams } from 'react-router';
 import { Link, Routes, Route } from 'react-router-dom';
 import loadable from '@loadable/component';
 import gravatar from 'gravatar';
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 // import CreateChannelModal from '@components/CreateChannelModal';
 // import ChannelList from '@components/ChannelList';
 // import DMList from '@components/DMList';
 // import InviteChannelModal from '@components/InviteChannelModal';
 // import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
-// import Menu from '@components/Menu';
-// import Modal from '@components/Modal';
+import Menu from '@components/Menu';
+import Modal from '@components/Modal';
 import useInput from '@hooks/useInput';
 // import useSocket from '@hooks/useSocket';
 import {
@@ -87,7 +87,7 @@ const Workspace: React.FC<Props> = ({ children }) => {
       });
   }, [queryClient]);
 
-  const onCloseUserProfile = useCallback((e: any) => {
+  const onCloseUserProfile: MouseEventHandler = useCallback((e) => {
     e.stopPropagation();
     setShowUserMenu(false);
   }, []);
@@ -124,7 +124,7 @@ const Workspace: React.FC<Props> = ({ children }) => {
         })
         .catch((error) => {
           console.dir(error);
-          // toast.error(error.response?.data, { position: 'bottom-center' });
+          toast.error(error.response?.data, { position: 'bottom-center' });
         });
     },
     [newWorkspace, newUrl, queryClient, setNewUrl, setNewWorkpsace],
@@ -158,32 +158,33 @@ const Workspace: React.FC<Props> = ({ children }) => {
       <Header>
         <RightMenu>
           <span onClick={onClickUserProfile}>
-            {/*<ProfileImg src={gravatar.url(userData.email, { s: '28px', d: 'retro' })} alt={userData.nickname} />*/}
-            {/*{showUserMenu && (*/}
-            {/*  <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onCloseUserProfile}>*/}
-            {/*    <ProfileModal>*/}
-            {/*      <img src={gravatar.url(userData.nickname, { s: '36px', d: 'retro' })} alt={userData.nickname} />*/}
-            {/*      <div>*/}
-            {/*        <span id="profile-name">{userData.nickname}</span>*/}
-            {/*        <span id="profile-active">Active</span>*/}
-            {/*      </div>*/}
-            {/*    </ProfileModal>*/}
-            <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
-            {/*  </Menu>*/}
-            {/*)}*/}
+            <ProfileImg src={gravatar.url(userData.email, { s: '28px', d: 'retro' })} alt={userData.nickname} />
+            {showUserMenu && (
+              <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onCloseUserProfile}>
+                프로필메뉴
+                <ProfileModal>
+                  <img src={gravatar.url(userData.nickname, { s: '36px', d: 'retro' })} alt={userData.nickname} />
+                  <div>
+                    <span id="profile-name">{userData.nickname}</span>
+                    <span id="profile-active">Active</span>
+                  </div>
+                </ProfileModal>
+                <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
+              </Menu>
+            )}
           </span>
         </RightMenu>
       </Header>
       <WorkspaceWrapper>
         <Workspaces>
-          {/*  {userData?.Workspaces.map((ws) => {*/}
-          {/*    return (*/}
-          {/*      <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>*/}
-          {/*        <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>*/}
-          {/*      </Link>*/}
-          {/*    );*/}
-          {/*  })}*/}
-          {/*  <AddButton onClick={onClickCreateWorkspace}>+</AddButton>*/}
+          {userData?.Workspaces.map((ws) => {
+            return (
+              <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>
+                <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>
+              </Link>
+            );
+          })}
+          <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
         <Channels>
           <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
@@ -209,19 +210,19 @@ const Workspace: React.FC<Props> = ({ children }) => {
           </Routes>
         </Chats>
       </WorkspaceWrapper>
-      {/*<Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>*/}
-      {/*  <form onSubmit={onCreateWorkspace}>*/}
-      {/*    <Label id="workspace-label">*/}
-      {/*      <span>워크스페이스 이름</span>*/}
-      {/*      <Input id="workspace" value={newWorkspace} onChange={onChangeNewWorkspace} />*/}
-      {/*    </Label>*/}
-      {/*    <Label id="workspace-url-label">*/}
-      {/*      <span>워크스페이스 url</span>*/}
-      {/*      <Input id="workspace" value={newUrl} onChange={onChangeNewUrl} />*/}
-      {/*    </Label>*/}
-      {/*    <Button type="submit">생성하기</Button>*/}
-      {/*  </form>*/}
-      {/*</Modal>*/}
+      <Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>
+        <form onSubmit={onCreateWorkspace}>
+          <Label id="workspace-label">
+            <span>워크스페이스 이름</span>
+            <Input id="workspace" value={newWorkspace} onChange={onChangeNewWorkspace} />
+          </Label>
+          <Label id="workspace-url-label">
+            <span>워크스페이스 url</span>
+            <Input id="workspace" value={newUrl} onChange={onChangeNewUrl} />
+          </Label>
+          <Button type="submit">생성하기</Button>
+        </form>
+      </Modal>
       {/*<CreateChannelModal*/}
       {/*  show={showCreateChannelModal}*/}
       {/*  onCloseModal={onCloseModal}*/}

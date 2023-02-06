@@ -372,6 +372,45 @@ channel과 dm 모두 workspace 레이아웃을 공유하기 때문에
 둘 중 선택을 하는 방법은 주소가 일관성 있으면 네스트 라우터를 사용하면 괜찮고
 그게 아니라면 각각 페이지에서 레이아웃을 감싸는 방법이 좋다.
 
+컴포넌트로 따로 나누는 기준은 재사용하냐 안하냐로
+리액트 문서에서는 단일책임 원칙, 하나의 컴포넌트는 하나의 역할만 한다 이 기준으로 나누는 것도 권장
+리액트 컴포넌트에서 매개변수로 들어오는 값이 있다면 타입을 정의해줘야한다.
+```typescript
+interface Props {
+  children: React.ReactNode;
+  style: React.CSSProperties;
+  show: boolean;
+  closeButton?: boolean;
+  onCloseModal: (e: any) => void;
+}
+
+const Menu: React.FC<Props> = ({ children }) => {
+```
+
+stopPropagation
+모달 창의 상위 엘리먼트인 배경에 닫는 이벤트 걸고, 모달창을 눌렸을 때 모달 창도 이벤트가 발생하여 닫힐수 있는데 
+그걸 끊어주는 게 stopPropagation
+이벤트 버블링을 막아준다.
+
+컴포넌트 이름.defaultProps 로 기본 값 넣어준다.
+
+만약 데이터를 사용할 때 이름이 헷갈린다면 좀 더 명확한 이름으로 바꿔준다. 콜론 : 으로 객체 구조분해할당
+import할 땐 as로 바꿀 수 있다.
+
+컴포넌트 나눌때 인풋이 들어가면 컴포넌트 나누는게 좋다.
+왜냐면 인풋 이벤트 발생할 때마다 리렌더링 되기 때문에.
+인풋이 state를 자꾸 변경하여 코드가 통채로 실행되기 때문이다.
+
+submit 이벤트도 새로고침 안되게
+e.preventDefault();
+그리고 사소하지만 띄어쓰기 거를수 있도록 trim() 함수 쓰기
+
+
+
+
+
+
+
 
 
 
