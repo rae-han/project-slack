@@ -2,14 +2,14 @@ import { Button, Input, Label } from '@pages/SignUp/styles';
 import { Channel, User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { useCallback, useState, useEffect, MouseEventHandler } from 'react';
+import React, { useCallback, useState, useEffect, MouseEventHandler, FormEventHandler } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate, useParams } from 'react-router';
 import { Link, Routes, Route } from 'react-router-dom';
 import loadable from '@loadable/component';
 import gravatar from 'gravatar';
 import { toast } from 'react-toastify';
-// import CreateChannelModal from '@components/CreateChannelModal';
+import CreateChannelModal from '@components/Modals/CreateChannelModal';
 // import ChannelList from '@components/ChannelList';
 // import DMList from '@components/DMList';
 // import InviteChannelModal from '@components/InviteChannelModal';
@@ -44,6 +44,7 @@ interface Props {
 }
 
 const Workspace: React.FC<Props> = ({ children }) => {
+  const { workspace } = useParams<{ workspace: string }>();
   const queryClient = useQueryClient();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
@@ -54,13 +55,12 @@ const Workspace: React.FC<Props> = ({ children }) => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkpsace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
 
-  const { workspace } = useParams<{ workspace: string }>();
   const { data: userData } = useQuery<User | false>(['user'], () => fetcher({ queryKey: '/api/users' }), {});
   const { data: channelData } = useQuery<Channel[]>(
     ['workspace', workspace, 'channel'],
     () => fetcher({ queryKey: `/api/workspaces/${workspace}/channels` }),
     {
-      enabled: !!userData,
+      enabled: !!userData, // 내가 로그인한 상태일 때
     },
   );
   // const [socket, disconnect] = useSocket(workspace);
@@ -100,8 +100,8 @@ const Workspace: React.FC<Props> = ({ children }) => {
     setShowCreateWorkspaceModal(true);
   }, []);
 
-  const onCreateWorkspace = useCallback(
-    (e: any) => {
+  const onCreateWorkspace: FormEventHandler = useCallback(
+    (e) => {
       e.preventDefault();
       if (!newWorkspace || !newWorkspace.trim()) return;
       if (!newUrl || !newUrl.trim()) return;
@@ -189,24 +189,28 @@ const Workspace: React.FC<Props> = ({ children }) => {
         <Channels>
           <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
           <MenuScroll>
-            {/*<Menu show={showWorkspaceModal} onCloseModal={toggleWorkspaceModal} style={{ top: 95, left: 80 }}>*/}
-            {/*  <WorkspaceModal>*/}
-            {/*    <h2>Sleact</h2>*/}
-            {/*    <button onClick={onClickInviteWorkspace}>워크스페이스에 사용자 초대</button>*/}
-            {/*    <button onClick={onClickAddChannel}>채널 만들기</button>*/}
-            {/*    <button onClick={onLogout}>로그아웃</button>*/}
-            {/*  </WorkspaceModal>*/}
-            {/*</Menu>*/}
+            MenuScroll
+            <Menu show={showWorkspaceModal} onCloseModal={toggleWorkspaceModal} style={{ top: 95, left: 80 }}>
+              <WorkspaceModal>
+                <h2>Sleact</h2>
+                {/*    <button onClick={onClickInviteWorkspace}>워크스페이스에 사용자 초대</button>*/}
+                <button onClick={onClickAddChannel}>채널 만들기</button>
+                <button onClick={onLogout}>로그아웃</button>
+              </WorkspaceModal>
+            </Menu>
             {/*<ChannelList />*/}
+            {channelData?.map((channel, idx) => (
+              <div key={idx}>123</div>
+            ))}
             {/*<DMList />*/}
           </MenuScroll>
         </Channels>
         <Chats>
           <Routes>
             {/*<Route path="/workspace/:workspace/channel/:channel" component={Channel} />*/}
-            <Route path="/channel" element={<ChannelPage />} />
+            <Route path="/channel/:channel" element={<ChannelPage />} />
             {/*<Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />*/}
-            <Route path="/dm" element={<DirectMessagePage />} />
+            <Route path="/dm/:id" element={<DirectMessagePage />} />
           </Routes>
         </Chats>
       </WorkspaceWrapper>
@@ -223,11 +227,11 @@ const Workspace: React.FC<Props> = ({ children }) => {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
-      {/*<CreateChannelModal*/}
-      {/*  show={showCreateChannelModal}*/}
-      {/*  onCloseModal={onCloseModal}*/}
-      {/*  setShowCreateChannelModal={setShowCreateChannelModal}*/}
-      {/*/>*/}
+      <CreateChannelModal
+        show={showCreateChannelModal}
+        onCloseModal={onCloseModal}
+        setShowCreateChannelModal={setShowCreateChannelModal}
+      />
       {/*<InviteWorkspaceModal*/}
       {/*  show={showInviteWorkspaceModal}*/}
       {/*  onCloseModal={onCloseModal}*/}
