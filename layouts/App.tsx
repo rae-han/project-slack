@@ -2,7 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import loadable from '@loadable/component';
 
-import Workspace from '@layouts/Workspace';
+// import Workspace from '@layouts/Workspace';
+const Workspace = loadable(() => import('@layouts/Workspace'));
 
 // import LogIn from '@pages/LogIn';
 // import SignUp from '@pages/SignUp';
@@ -13,6 +14,7 @@ const SignUp = loadable(() => import('@pages/SignUp'));
 // const SignUp = React.lazy(() => import('@pages/SignUp'));
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
+const Test = loadable(() => import('@pages/Test'));
 
 const App: React.FC = () => {
   return (
@@ -24,6 +26,7 @@ const App: React.FC = () => {
       <Route path="/workspace/:workspace/*" element={<Workspace />} />
       {/*<Route path="/workspace/channel" element={<Channel />} />*/}
       {/*<Route path="/workspace/dm" element={<DirectMessage />} />*/}
+      <Route path="/test" element={<Test />} />
     </Routes>
   );
 };
