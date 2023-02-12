@@ -10,8 +10,8 @@ import loadable from '@loadable/component';
 import gravatar from 'gravatar';
 import { toast } from 'react-toastify';
 import CreateChannelModal from '@components/Modals/CreateChannelModal';
-// import ChannelList from '@components/ChannelList';
-// import DMList from '@components/DMList';
+import ChannelList from '@components/ChannelList';
+import DMList from '@components/DMList';
 import InviteChannelModal from '@components/Modals/InviteChannelModal';
 import InviteWorkspaceModal from '@components/Modals/InviteWorkspaceModal';
 import Menu from '@components/Menu';
@@ -198,11 +198,11 @@ const Workspace: React.FC<Props> = ({ children }) => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {/*<ChannelList />*/}
+            <ChannelList />
             {channelData?.map((channel, idx) => (
               <div key={idx}>123</div>
             ))}
-            {/*<DMList />*/}
+            <DMList />
           </MenuScroll>
         </Channels>
         <Chats>

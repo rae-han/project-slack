@@ -8,6 +8,7 @@ import loadable from '@loadable/component';
 
 const ParallelUseQuery = loadable(() => import('@pages/Test/Parallel/useQuery'));
 const ParallelUseQueries = loadable(() => import('@pages/Test/Parallel/useQueries'));
+const DependentQeury = loadable(() => import('@pages/Test/Dependent'));
 
 const fetcher = async ({ queryKey }: { queryKey: string }) => {
   const response = await axios.get(queryKey, {
@@ -53,6 +54,7 @@ const Test = () => {
           <Routes>
             <Route path="/parallel/1" element={<ParallelUseQuery></ParallelUseQuery>} />
             <Route path="/parallel/2" element={<ParallelUseQueries></ParallelUseQueries>} />
+            <Route path="/dependent" element={<DependentQeury></DependentQeury>} />
           </Routes>
           <div>
             <h1>useQuery</h1>

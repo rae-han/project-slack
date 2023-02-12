@@ -97,10 +97,6 @@ const config: Configuration = {
         target: 'http://localhost:3095',
         changeOrigin: true,
       },
-      '/posts': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
     },
   },
 };

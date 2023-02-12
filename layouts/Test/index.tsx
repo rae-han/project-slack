@@ -10,7 +10,7 @@ const TestLayout: React.FC<Props> = ({ children }) => {
     { route: '/test', text: 'useQuery' },
     { route: '/test/parallel/1', text: 'parallel with useQuery' },
     { route: '/test/parallel/2', text: 'parallel with useQueries' },
-    { route: '/test', text: 'root' },
+    { route: '/test/dependent', text: 'dependent with useQuery' },
   ]);
 
   return (
