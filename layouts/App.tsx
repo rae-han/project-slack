@@ -26,7 +26,7 @@ const App: React.FC = () => {
       <Route path="/workspace/:workspace/*" element={<Workspace />} />
       {/*<Route path="/workspace/channel" element={<Channel />} />*/}
       {/*<Route path="/workspace/dm" element={<DirectMessage />} />*/}
-      <Route path="/test" element={<Test />} />
+      <Route path="/test/*" element={<Test />} />
     </Routes>
   );
 };
