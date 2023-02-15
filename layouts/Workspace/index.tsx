@@ -17,7 +17,7 @@ import InviteWorkspaceModal from '@components/Modals/InviteWorkspaceModal';
 import Menu from '@components/Menu';
 import Modal from '@components/Modal';
 import useInput from '@hooks/useInput';
-// import useSocket from '@hooks/useSocket';
+import useSocket from '@hooks/useSocket';
 import {
   AddButton,
   Channels,
@@ -63,19 +63,21 @@ const Workspace: React.FC<Props> = ({ children }) => {
       enabled: !!userData, // 내가 로그인한 상태일 때
     },
   );
-  // const [socket, disconnect] = useSocket(workspace);
+  const [socket, disconnect] = useSocket(workspace);
 
-  // useEffect(() => {
-  //   if (channelData && userData && socket) {
-  //     console.log(socket);
-  //     socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
-  //   }
-  // }, [socket, channelData, userData]);
-  // useEffect(() => {
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, [workspace, disconnect]);
+  // socket connect
+  useEffect(() => {
+    if (channelData && userData && socket) {
+      console.log(socket);
+      socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
+    }
+  }, [socket, channelData, userData]);
+  // workspace가 바뀐다면 socket 연결을 끊어줘야 함.
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [workspace, disconnect]);
 
   const onLogout = useCallback(() => {
     axios

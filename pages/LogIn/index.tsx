@@ -3,7 +3,15 @@ import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } fro
 import { User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import axios, { AxiosError } from 'axios';
-import React, { FormEvent, FormEventHandler, MouseEventHandler, UIEventHandler, useCallback, useState } from 'react';
+import React, {
+  FormEvent,
+  FormEventHandler,
+  MouseEventHandler,
+  UIEventHandler,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // npm i @tanstack/react-query
@@ -33,12 +41,14 @@ const LogIn = () => {
       },
     },
   );
-
-  type SubmitEventHandler = FormEventHandler<HTMLFormElement> | MouseEventHandler<Element>;
+  const users = useRef([
+    { email: 'qwer@qwer.qwer', password: 'qwer' },
+    { email: 'asdf@asdf.asdf', password: 'asdf' },
+  ]);
 
   const [logInError, setLogInError] = useState(false);
-  const [email, onChangeEmail] = useInput('qwer@qwer.qwer');
-  const [password, onChangePassword] = useInput('qwer');
+  const [email, onChangeEmail, setEmail] = useInput('');
+  const [password, onChangePassword, setPassword] = useInput('');
   const onSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault();
@@ -47,7 +57,6 @@ const LogIn = () => {
     [email, password, mutation],
   );
 
-  console.log(onSubmit);
   if (isLoading) {
     return <div>로딩중...</div>;
   }
@@ -65,6 +74,21 @@ const LogIn = () => {
   return (
     <div id="container">
       <Header>Sleact</Header>
+      <div>
+        <ul>
+          {users.current.map((user) => (
+            <li
+              key={user.email}
+              onClick={() => {
+                setEmail(user.email);
+                setPassword(user.password);
+              }}
+            >
+              {user.email}
+            </li>
+          ))}
+        </ul>
+      </div>
       <Form onSubmit={onSubmit}>
         <Label id="email-label">
           <span>이메일 주소</span>
