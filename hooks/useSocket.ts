@@ -3,8 +3,8 @@ import { useCallback } from 'react';
 
 const backUrl = 'http://localhost:3095';
 
-const sockets: { [key: string]: Socket } = {};
-const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
+const sockets: { [key: string]: SocketIOClient.Socket } = {};
+const useSocket = (workspace?: string): [SocketIOClient.Socket | undefined, () => void] => {
   console.log('rerender useSocket', workspace);
   // // 소켓 통신 자체는 간단하다. emit으로 보내고 on으로 받고.
   // const socket = io.connect(`${backUrl}`);
@@ -23,55 +23,57 @@ const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
 
   // # v2
   // console.log('rerender', workspace);
-  // const disconnect = useCallback(() => {
-  //   if (workspace) {
-  //     sockets[workspace].disconnect();
-  //     delete sockets[workspace];
-  //   }
-  // }, [workspace]);
-  // if (!workspace) {
-  //   return [undefined, disconnect];
-  // }
-  // if (!sockets[workspace]) {
-  //   sockets[workspace] = io.connect(`${backUrl}/ws-${workspace}`, {
-  //     transports: ['websocket'],
-  //   });
-  // }
-
-  // # v4
   const disconnect = useCallback(() => {
     if (workspace) {
       sockets[workspace].disconnect();
       delete sockets[workspace];
     }
   }, [workspace]);
-
   if (!workspace) {
     return [undefined, disconnect];
-    // disconnect를 여기다 써야하는데 디스커넥터를 만드는 함수가 더 아래 있다.
-    // 이럴땐 자바스크립트 스코프 지식이 필요한데 함수로 빼서..
   }
-
-  // 이게 없으면 리렌더링이 일어날때마다 연결이 맺어진다.
   if (!sockets[workspace]) {
-    sockets[workspace] = io(`${backUrl}/ws-${workspace}`, {
+    sockets[workspace] = io.connect(`${backUrl}/ws-${workspace}`, {
       transports: ['websocket'],
     });
   }
 
-  sockets[workspace].emit('hello', 'world');
-  sockets[workspace].on('message', (data) => {
-    console.log(data);
-  });
-  sockets[workspace].on('data', (data) => {
-    console.log(data);
-  });
-  sockets[workspace].on('onlineList', (data) => {
-    console.log(data);
-  });
+  // # v4
+  // const disconnect = useCallback(() => {
+  //   if (workspace) {
+  //     sockets[workspace].disconnect();
+  //     delete sockets[workspace];
+  //   }
+  // }, [workspace]);
+  //
+  // if (!workspace) {
+  //   return [undefined, disconnect];
+  //   // disconnect를 여기다 써야하는데 디스커넥터를 만드는 함수가 더 아래 있다.
+  //   // 이럴땐 자바스크립트 스코프 지식이 필요한데 함수로 빼서..
+  // }
+  //
+  // // 이게 없으면 리렌더링이 일어날때마다 연결이 맺어진다.
+  // if (!sockets[workspace]) {
+  //   sockets[workspace] = io(`${backUrl}/ws-${workspace}`, {
+  //     transports: ['websocket'],
+  //   });
+  // }
+  //
+  // sockets[workspace].emit('hello', 'world');
+  // sockets[workspace].on('message', (data) => {
+  //   console.log(data);
+  // });
+  // sockets[workspace].on('data', (data) => {
+  //   console.log(data);
+  // });
+  // sockets[workspace].on('onlineList', (data) => {
+  //   console.log(data);
+  // });
+  //
+  // // const disconnect = sockets[workspace].disconnect;
+  //
 
-  // const disconnect = sockets[workspace].disconnect;
-
+  // ## return
   return [sockets[workspace], disconnect];
   // return [sockets[workspace], disconnect];
 };
