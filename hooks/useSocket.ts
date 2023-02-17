@@ -5,6 +5,7 @@ const backUrl = 'http://localhost:3095';
 
 const sockets: { [key: string]: Socket } = {};
 const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
+  console.log('rerender useSocket', workspace);
   // // 소켓 통신 자체는 간단하다. emit으로 보내고 on으로 받고.
   // const socket = io.connect(`${backUrl}`);
   // socket.emit('hello', 'world'); // 서버에 hello 라는 이벤트 이름으로 world라는 데이터를 보낸다.
@@ -20,6 +21,7 @@ const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
   // // workspace = namespace, channel = room 으로 설계를 핡 것이다.
   // // 만약 끊는 것을 잘못하면 다른 워크스페이스나 채널로 갔는데 다른 메세지가 오거나 갈수도 있다.
 
+  // # v2
   // console.log('rerender', workspace);
   // const disconnect = useCallback(() => {
   //   if (workspace) {
@@ -35,8 +37,8 @@ const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
   //     transports: ['websocket'],
   //   });
   // }
-  //
 
+  // # v4
   const disconnect = useCallback(() => {
     if (workspace) {
       sockets[workspace].disconnect();
@@ -50,7 +52,13 @@ const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
     // 이럴땐 자바스크립트 스코프 지식이 필요한데 함수로 빼서..
   }
 
-  sockets[workspace] = io(`${backUrl}/ws-${workspace}`);
+  // 이게 없으면 리렌더링이 일어날때마다 연결이 맺어진다.
+  if (!sockets[workspace]) {
+    sockets[workspace] = io(`${backUrl}/ws-${workspace}`, {
+      transports: ['websocket'],
+    });
+  }
+
   sockets[workspace].emit('hello', 'world');
   sockets[workspace].on('message', (data) => {
     console.log(data);

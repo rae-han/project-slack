@@ -67,6 +67,7 @@ const Workspace: React.FC<Props> = ({ children }) => {
 
   // socket connect
   useEffect(() => {
+    console.log(socket);
     if (channelData && userData && socket) {
       console.log(socket);
       socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
