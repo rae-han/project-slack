@@ -1,5 +1,6 @@
 #
-npm i raact react-dom @types/react @types/react-dom
+npm i raact react-dom 
+npm i -D @types/react @types/react-dom
 
 # ES-Lint, Prettier
 npm i -D eslint
