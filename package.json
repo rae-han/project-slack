@@ -18,7 +18,7 @@
     "@loadable/component": "^5.15.2",
     "@tanstack/react-query": "^4.23.0",
     "@tanstack/react-query-devtools": "^4.23.0",
-    "autosize": "^6.0.0",
+    "autosize": "^6.0.1",
     "axios": "^0.26.1",
     "core-js": "^3.15.1",
     "css-loader": "^6.7.3",
