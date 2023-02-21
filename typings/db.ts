@@ -16,7 +16,7 @@ export interface Channel {
   WorkspaceId: number;
 }
 
-export interface IChat {
+export interface Chat {
   // 채널의 채팅
   id: number;
   UserId: number;
@@ -27,7 +27,7 @@ export interface IChat {
   Channel: Channel;
 }
 
-export interface IDM {
+export interface DM {
   // DM 채팅
   id: number;
   SenderId: number; // 보낸 사람 아이디

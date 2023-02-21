@@ -1,17 +1,18 @@
 // import Chat from '@components/Chat';
 import { ChatZone, Section, StickyHeader } from '@components/ChatList/styles';
-import { IDM, IChat } from '@typings/db';
+import { DM, Chat } from '@typings/db';
 import React, { useCallback, forwardRef, MutableRefObject, WheelEventHandler } from 'react';
 // import { Scrollbars } from 'react-custom-scrollbars-2';
-import { InfiniteQueryObserverResult } from '@tanstack/react-query';
+import { InfiniteData, InfiniteQueryObserverResult } from '@tanstack/react-query';
 
 interface Props {
-  chatSections: { [key: string]: (IDM | IChat)[] };
-  fetchNext: () => Promise<InfiniteQueryObserverResult>;
-  isReachingEnd: boolean;
+  // chatSections: { [key: string]: (IDM | IChat)[] };
+  // fetchNext: () => Promise<InfiniteQueryObserverResult>;
+  // isReachingEnd: boolean;
+  chatData: InfiniteData<DM[]>;
 }
 // const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, fetchNext, isReachingEnd }, scrollRef) => {
-const ChatList = () => {
+const ChatList: React.FC<Props> = ({ chatData }) => {
   // const onScroll: WheelEventHandler = useCallback(
   //   (values) => {
   //     if (values.scrollTop === 0 && !isReachingEnd) {
@@ -44,6 +45,9 @@ const ChatList = () => {
       {/*    );*/}
       {/*  })}*/}
       {/*</Scrollbars>*/}
+      {chatData?.pages.map((chats, i) => {
+        return chats?.map((chat) => <div>{chat.id}</div>);
+      })}
     </ChatZone>
   );
 };

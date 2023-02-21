@@ -3,7 +3,7 @@ import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
 // import useSocket from '@hooks/useSocket';
 import { Container, Header, DragOver } from '@pages/DirectMessage/styles';
-import { IDM } from '@typings/db';
+import { DM } from '@typings/db';
 import fetcher from '@utils/fetcher';
 // import makeSection from '@utils/makeSection';
 import axios, { AxiosError } from 'axios';
@@ -25,7 +25,7 @@ const DirectMessage = () => {
     data: chatData,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery<IDM[]>(
+  } = useInfiniteQuery<DM[]>(
     ['workspace', workspace, 'dm', id, 'chat'],
     ({ pageParam }) =>
       // fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${pageParam + 1}` }),
@@ -43,13 +43,13 @@ const DirectMessage = () => {
   // const scrollbarRef = useRef<Scrollbars>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const mutation = useMutation<IDM, AxiosError, { content: string }>(
+  const mutation = useMutation<DM, AxiosError, { content: string }>(
     ['workspace', workspace, 'dm', id, 'chat'],
     () => fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats` }),
+    // () => fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats` }),
     {
       onMutate(mutateData) {
-        console.log('mutateData', mutateData);
-        queryClient.setQueryData<InfiniteData<IDM[]>>(['workspace', workspace, 'dm', id, 'chat'], (data) => {
+        queryClient.setQueryData<InfiniteData<DM[]>>(['workspace', workspace, 'dm', id, 'chat'], (data) => {
           const newPages = data?.pages.slice() || [];
           newPages[0].unshift({
             id: (data?.pages[0][0]?.id || 0) + 1,
@@ -82,17 +82,23 @@ const DirectMessage = () => {
       e.preventDefault();
       console.log('chat in obSubmitForm', chat);
       if (chat?.trim() && chatData) {
-        mutation.mutate({ content: chat });
+        // mutation.mutate({ content: chat });
+        axios
+          .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
+            content: chat,
+          })
+          .then(() => setChat(''))
+          .catch(console.error);
       }
     },
     [chat, chatData, mutation],
   );
 
   const onMessage = useCallback(
-    (data: IDM) => {
+    (data: DM) => {
       // id는 상대방 아이디
       if (data.SenderId === Number(id) && myData.id !== Number(id)) {
-        queryClient.setQueryData<InfiniteData<IDM[]>>(['workspace', workspace, 'dm', id, 'chat'], (prev) => {
+        queryClient.setQueryData<InfiniteData<DM[]>>(['workspace', workspace, 'dm', id, 'chat'], (prev) => {
           const newPages = prev?.pages.slice() || [];
           newPages[0].unshift(data);
           return {
@@ -172,6 +178,10 @@ const DirectMessage = () => {
     return null;
   }
 
+  if (!chatData) {
+    return null;
+  }
+
   // const chatSections = makeSection(chatData ? chatData.pages.flat().reverse() : []);
 
   return (
@@ -181,10 +191,11 @@ const DirectMessage = () => {
         <span>{userData.nickname}</span>
       </Header>
       <ChatList
-      // chatSections={chatSections}
-      // ref={scrollbarRef}
-      // fetchNext={fetchNextPage}
-      // isReachingEnd={isReachingEnd}
+        // chatSections={chatSections}
+        // ref={scrollbarRef}
+        // fetchNext={fetchNextPage}
+        // isReachingEnd={isReachingEnd}
+        chatData={chatData}
       />
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
       {dragOver && <DragOver>업로드!</DragOver>}

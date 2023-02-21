@@ -6,7 +6,7 @@ import InviteChannelModal from '@components/Modals/InviteChannelModal';
 import useInput from '@hooks/useInput';
 import useSocket from '@hooks/useSocket';
 import { Container, Header, DragOver } from '@pages/Channel/styles';
-import { Channel, IChat, IDM, User } from '@typings/db';
+import { Channel, Chat, DM, User } from '@typings/db';
 import fetcher from '@utils/fetcher';
 // import makeSection from '@utils/makeSection';
 import axios, { AxiosError } from 'axios';
@@ -26,7 +26,7 @@ const ChannelPage = () => {
     data: chatData,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery<IChat[]>(
+  } = useInfiniteQuery<Chat[]>(
     ['workspace', workspace, 'channel', channel, 'chat'],
     ({ pageParam }) =>
       // fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=${pageParam + 1}` }),
@@ -51,33 +51,30 @@ const ChannelPage = () => {
   const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
-  const mutation = useMutation<IDM, AxiosError, { content: string }>(
+  const mutation = useMutation<DM, AxiosError, { content: string }>(
     ['workspace', workspace, 'channel', channel, 'chat'],
     () => fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats` }),
     {
       onMutate(mutateData) {
         if (!channelData) return;
-        queryClient.setQueryData<InfiniteData<IChat[]>>(
-          ['workspace', workspace, 'channel', channel, 'chat'],
-          (data) => {
-            // console.log('data', data);
-            // const newPages = data?.pages.slice() || [];
-            // newPages[0].unshift({
-            //   id: (data?.pages[0][0]?.id || 0) + 1,
-            //   content: mutateData.content,
-            //   UserId: myData.id,
-            //   User: myData,
-            //   ChannelId: channelData.id,
-            //   Channel: channelData,
-            //   createdAt: new Date(),
-            // });
-            return {
-              pageParams: data?.pageParams || [],
-              // pages: newPages,
-              pages: [],
-            };
-          },
-        );
+        queryClient.setQueryData<InfiniteData<Chat[]>>(['workspace', workspace, 'channel', channel, 'chat'], (data) => {
+          // console.log('data', data);
+          // const newPages = data?.pages.slice() || [];
+          // newPages[0].unshift({
+          //   id: (data?.pages[0][0]?.id || 0) + 1,
+          //   content: mutateData.content,
+          //   UserId: myData.id,
+          //   User: myData,
+          //   ChannelId: channelData.id,
+          //   Channel: channelData,
+          //   createdAt: new Date(),
+          // });
+          return {
+            pageParams: data?.pageParams || [],
+            // pages: newPages,
+            pages: [],
+          };
+        });
         setChat('');
         // scrollbarRef.current?.scrollToBottom();
       },
@@ -104,20 +101,17 @@ const ChannelPage = () => {
   );
 
   const onMessage = useCallback(
-    (data: IChat) => {
+    (data: Chat) => {
       // id는 상대방 아이디
       if (data.Channel.name === channel && (data.content.startsWith('uploads\\') || data.UserId !== myData?.id)) {
-        queryClient.setQueryData<InfiniteData<IChat[]>>(
-          ['workspace', workspace, 'channel', channel, 'chat'],
-          (prev) => {
-            const newPages = prev?.pages.slice() || [];
-            newPages[0].unshift(data);
-            return {
-              pageParams: prev?.pageParams || [],
-              pages: newPages,
-            };
-          },
-        );
+        queryClient.setQueryData<InfiniteData<Chat[]>>(['workspace', workspace, 'channel', channel, 'chat'], (prev) => {
+          const newPages = prev?.pages.slice() || [];
+          newPages[0].unshift(data);
+          return {
+            pageParams: prev?.pageParams || [],
+            pages: newPages,
+          };
+        });
         // if (scrollbarRef.current) {
         //   if (
         //     scrollbarRef.current.getScrollHeight() <
@@ -234,12 +228,12 @@ const ChannelPage = () => {
           </button>
         </div>
       </Header>
-      <ChatList
-      // chatSections={chatSections}
-      // ref={scrollbarRef}
-      // fetchNext={fetchNextPage}
-      // isReachingEnd={isReachingEnd}
-      />
+      {/*<ChatList*/}
+      {/*  chatSections={chatSections}*/}
+      {/*  ref={scrollbarRef}*/}
+      {/*  fetchNext={fetchNextPage}*/}
+      {/*  isReachingEnd={isReachingEnd}*/}
+      {/*/>*/}
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
       <InviteChannelModal
         show={showInviteChannelModal}
