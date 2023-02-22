@@ -9,7 +9,7 @@ import fetcher from '@utils/fetcher';
 import axios, { AxiosError } from 'axios';
 import React, { DragEventHandler, FormEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import gravatar from 'gravatar';
-// import Scrollbars from 'react-custom-scrollbars-2';
+import Scrollbars from 'react-custom-scrollbars-2';
 import { useQuery, useQueryClient, useInfiniteQuery, useMutation, InfiniteData } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 
@@ -40,7 +40,7 @@ const DirectMessage = () => {
   // const [socket] = useSocket(workspace);
   const isEmpty = chatData?.pages[0]?.length === 0;
   const isReachingEnd = isEmpty || (chatData && chatData?.pages[chatData?.pages.length - 1]?.length < 20) || false;
-  // const scrollbarRef = useRef<Scrollbars>(null);
+  const scrollbarRef = useRef<Scrollbars>(null);
   const [dragOver, setDragOver] = useState(false);
 
   const mutation = useMutation<DM, AxiosError, { content: string }>(

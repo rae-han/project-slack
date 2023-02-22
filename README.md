@@ -526,6 +526,51 @@ transports: ['websocket'],
 2, 3, 2, 3 같은건 ping-pong 이라고 해서
 연결이 잘 유지되고 있나 socket.io 가 확인하는 것
 
+react-custom-scrollbars
+npm i react-custom-scrollbars-2
+react-custom-scrollbars-2 는 typescript 로 작성돼 있다.
+
+바퀴를 직접 만들지 마라 -> 좋은 라이브러리가 있다면 잘 쓰자.
+
+날짜를 직접 자르거나 Date를 사용해서 가공하면 된다.
+그러나 글로벌 서비스면 국가마다 표현법이 다르므로 라이브러리를 사용하면 편하다.
+
+보통은 moment를 많이 쓰지만 강의에서는 day.js를 사용했다.
+이유는 dayjs가 불변성을 지킬수 있고 가볍고 moment 사용법이 비슷해 마이그레이션 하기 좋기 때문이다.
+moment는 불변성을 지키지 않는다 그럼 참조 관계가 유지된다.
+날짜 객체가 있고 그걸 복사해서 썼을 때 복사한 값을 수정하면 오리진 객체가 변한다.
+
+date-fns는 lodash 스타일 dayjs와 date-fns 는 취향차이
+moment 만들 애들이 새로 만든건 luxon인데 이 라이브러리도 immutable
+
+질문 1
+const onScroll: WheelEventHandler 를 하고
+<Scrollbars autoHide onScrollFrame={onScroll}> 를 사용할 때 
+onScrollFrame 에서 아래와 같은 에러가 난다.
+```
+TS2769: No overload matches this call. 
+  Overload 1 of 2, '(props: ScrollbarProps | Readonly<ScrollbarProps>): Scrollbars', gave the following error. 
+  Type 'WheelEventHandler<Element>' is not assignable to type '(values: positionValues) => void'. 
+  Types of parameters 'event' and 'values' are incompatible. 
+  Type 'positionValues' is missing the following properties from type 'WheelEvent<Element>': deltaMode, deltaX, deltaY, deltaZ, and 33 more. 
+  Overload 2 of 2, '(props: ScrollbarProps, context: any): Scrollbars', gave the following error. 
+  Type 'WheelEventHandler<Element>' is not assignable to type '(values: positionValues) => void'. 
+```
+const onScroll: (values: positionValues) => void = useCallback(
+해서 해결 했는데 이 방법이 맞을지? 더 좋은 방법이 있는지 궁금하다.
+
+npm i react-mentions
+
+<Mention
+appendSpaceOnAdd
+trigger="@"
+data={memberData?.map((v) => ({ id: v.id, display: v.nickname })) || []}
+renderSuggestion={renderSuggestion}
+/>
+
+@ 칠 때 활성화 된다.
+appendSpaceOnAdd 는 선택 했다면 뒤에 공백 하나 넣어주겠다.
+맴버 데이터를 변형해서 넣는 이유는 id와 nickname을 보여주기 위해서. 이런건 공식 문서보고 알아서 하자.
 
 
 
