@@ -571,8 +571,33 @@ renderSuggestion={renderSuggestion}
 @ 칠 때 활성화 된다.
 appendSpaceOnAdd 는 선택 했다면 뒤에 공백 하나 넣어주겠다.
 맴버 데이터를 변형해서 넣는 이유는 id와 nickname을 보여주기 위해서. 이런건 공식 문서보고 알아서 하자.
+renderSuggestion 은 작성하 ㄹ때 동작을 어떻게 해줄 것인지
 
+emotion 은 변수를 보내서 상태를 바꿔줄 수 있다.
+${({ focus }) =>
+focus &&
+`
+background: #1264a3;
+color: white;
+`};
 
+이게 안되면 클래스를 여러개 만들어서 클래스를 바꾸는 식으로 했다.
+css는 변수가 없기 때문에.
+이모션은 변수를 사용 가능하다.
+
+이모션에서 ``는 함수를 호출하는 방법니다.
+function func() {}
+func();
+func.call,bind,...
+func``; - 태그드리터럴이란 함수 호출 방법 문법
+이모션 안에 변수를 쓸땐 템프릿 리터럴 안에 함수가 있는 방식
+func`${() => {}}`
+
+MentionInput 안에 Metion 이 있는게 리액트 멘션의 사용법
+근데 프로젝트에서 그렇게 안한 것은 MetionsTextarea = styled(MetionInput)``
+이렇게 하면 기존에 존재하는 컴포넌트에 스타일을 추가할수 있다.
+
+대신 이땐 속성 값을 ref 대신 inputRef로 바꿔달라고 공식 문서에 나와있다.
 
 
 

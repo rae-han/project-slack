@@ -53,12 +53,14 @@ const ChatBox: React.FC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholde
       focus: boolean,
     ): React.ReactNode => {
       if (!memberData) return;
+      // memberData가 로딩이 됐다면.
       return (
         <EachMention focus={focus}>
           <img
             src={gravatar.url(memberData[index].email, { s: '20px', d: 'retro' })}
             alt={memberData[index].nickname}
           />
+          {/* 해당 하는 사람이 하이라이트가 되도록 */}
           <span>{highlightedDisplay}</span>
         </EachMention>
       );
