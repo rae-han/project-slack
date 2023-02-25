@@ -1,11 +1,11 @@
 import ChatBox from '@components/ChatBox';
 import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
-// import useSocket from '@hooks/useSocket';
+import useSocket from '@hooks/useSocket';
 import { Container, Header, DragOver } from '@pages/DirectMessage/styles';
 import { DM } from '@typings/db';
 import fetcher from '@utils/fetcher';
-// import makeSection from '@utils/makeSection';
+import makeSection from '@utils/makeSection';
 import axios, { AxiosError } from 'axios';
 import React, { DragEventHandler, FormEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import gravatar from 'gravatar';
@@ -182,7 +182,9 @@ const DirectMessage = () => {
     return null;
   }
 
-  // const chatSections = makeSection(chatData ? chatData.pages.flat().reverse() : []);
+  const chatSections = makeSection(chatData ? chatData.pages.flat().reverse() : []);
+  // const chatSections = makeSection(chatData ? [].concat(chatData) : []);
+  // const chatSections = makeSection(chatData ? [...chatData] : []);
 
   return (
     <Container onDrop={onDrop} onDragOver={onDragOver}>
@@ -191,7 +193,7 @@ const DirectMessage = () => {
         <span>{userData.nickname}</span>
       </Header>
       <ChatList
-        // chatSections={chatSections}
+        chatSections={chatSections}
         // ref={scrollbarRef}
         // fetchNext={fetchNextPage}
         // isReachingEnd={isReachingEnd}
