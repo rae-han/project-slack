@@ -623,6 +623,33 @@ React.memo의 기능은 props가 같으면 부모가 바뀌어도 자식 컴포�
 
 알고리즘 조건 5가지
 
+forwardRef
+다른 ref를 만들어서 그 ref를 다른 컴포넌트에 전달할 때
+forwardRef쓰면 props 두번째 자리에 전달할 수 있다.
+
+?? props로 안넘기고 forwardRef를 사용하면 무슨 차이가 있을까??
+
+useSWR에서 infinite scrolling을 위한 메서드
+useSWRInfinite 를 제공한다.
+
+그냥 사용하면 안되고 url를 함수 리턴으로 바꿔줘야 한다.
+그리고 그 함수의 매개변수에 페이지 수(index)를 적어줘야 한다.
+`/api/request` -> (index) => `api/request`
+
+setSize는 페이지 수를 바꿔주는 역할을 한다.
+
+infinite scroll 할때 isEmpty와 isReachingEnd 상태를 따로 관리하면 좋은데
+isEmpty는 데이터가 비어 있을 때,
+isReacingEnd는 데이터를 덜 가져왔을 때, 다음 데이터가 없을 것으로 판명될 때, true가 된다.
+
+infinite를 사용할 때 2차원 배열로 값이 온다.
+그리고 값은 앞에 추가된다.
+flat 메서드를 사용해서 2차원 배열을 1차원 배열로 만들어서 사용해도 된다.
+
+
+
+
+
 
 
 

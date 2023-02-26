@@ -66,7 +66,7 @@ const DirectMessage = () => {
           };
         });
         setChat('');
-        // scrollbarRef.current?.scrollToBottom();
+        scrollbarRef.current?.scrollToBottom();
       },
       onError(error) {
         console.error(error);
@@ -106,17 +106,17 @@ const DirectMessage = () => {
             pages: newPages,
           };
         });
-        // if (scrollbarRef.current) {
-        //   if (
-        //     scrollbarRef.current.getScrollHeight() <
-        //     scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
-        //   ) {
-        //     console.log('scrollToBottom!', scrollbarRef.current?.getValues());
-        //     setTimeout(() => {
-        //       scrollbarRef.current?.scrollToBottom();
-        //     }, 50);
-        //   }
-        // }
+        if (scrollbarRef.current) {
+          if (
+            scrollbarRef.current.getScrollHeight() <
+            scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
+          ) {
+            console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+            setTimeout(() => {
+              scrollbarRef.current?.scrollToBottom();
+            }, 50);
+          }
+        }
       }
     },
     [workspace, id, myData.id, queryClient],
@@ -130,13 +130,14 @@ const DirectMessage = () => {
   // }, [socket, onMessage]);
 
   // 로딩 시 스크롤바 제일 아래로
-  // useEffect(() => {
-  //   if (chatData?.pages.length === 1) {
-  //     setTimeout(() => {
-  //       scrollbarRef.current?.scrollToBottom();
-  //     }, 100);
-  //   }
-  // }, [chatData]);
+  useEffect(() => {
+    console.log('chatData', chatData);
+    if (chatData?.pages.length === 1) {
+      setTimeout(() => {
+        scrollbarRef.current?.scrollToBottom();
+      }, 100);
+    }
+  }, [chatData]);
 
   const onDrop: DragEventHandler = useCallback(
     (e) => {
@@ -194,9 +195,9 @@ const DirectMessage = () => {
       </Header>
       <ChatList
         chatSections={chatSections}
-        // ref={scrollbarRef}
+        ref={scrollbarRef}
         // fetchNext={fetchNextPage}
-        // isReachingEnd={isReachingEnd}
+        isReachingEnd={isReachingEnd}
         chatData={chatData}
       />
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
