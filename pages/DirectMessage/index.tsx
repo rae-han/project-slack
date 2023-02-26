@@ -14,6 +14,7 @@ import { useQuery, useQueryClient, useInfiniteQuery, useMutation, InfiniteData }
 import { useParams } from 'react-router';
 
 const DirectMessage = () => {
+  const perPage = 10;
   const queryClient = useQueryClient();
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
   const { data: userData } = useQuery(['workspace', workspace, 'users', id], () =>
@@ -27,19 +28,22 @@ const DirectMessage = () => {
     hasNextPage,
   } = useInfiniteQuery<DM[]>(
     ['workspace', workspace, 'dm', id, 'chat'],
-    ({ pageParam }) =>
-      // fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${pageParam + 1}` }),
-      fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1` }),
+    ({ pageParam = 0 }) =>
+      fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats?perPage=${perPage}&page=${pageParam + 1}` }),
+    // fetcher({ queryKey: `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1` }),
     {
       getNextPageParam: (lastPage, pages) => {
+        console.log('getNextPageParam', lastPage, pages);
         if (lastPage.length === 0) return;
         return pages.length;
       },
     },
   );
-  // const [socket] = useSocket(workspace);
+  const [socket] = useSocket(workspace);
+  console.log('chatData', chatData);
   const isEmpty = chatData?.pages[0]?.length === 0;
-  const isReachingEnd = isEmpty || (chatData && chatData?.pages[chatData?.pages.length - 1]?.length < 20) || false;
+  const isReachingEnd = isEmpty || (chatData && chatData?.pages[chatData?.pages.length - 1]?.length < perPage) || false;
+  console.log('is', isEmpty, isReachingEnd);
   const scrollbarRef = useRef<Scrollbars>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -87,7 +91,10 @@ const DirectMessage = () => {
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
             content: chat,
           })
-          .then(() => setChat(''))
+          .then(() => {
+            setChat('');
+            scrollbarRef.current?.scrollToBottom();
+          })
           .catch(console.error);
       }
     },
@@ -122,12 +129,12 @@ const DirectMessage = () => {
     [workspace, id, myData.id, queryClient],
   );
 
-  // useEffect(() => {
-  //   socket?.on('dm', onMessage);
-  //   return () => {
-  //     socket?.off('dm', onMessage);
-  //   };
-  // }, [socket, onMessage]);
+  useEffect(() => {
+    socket?.on('dm', onMessage);
+    return () => {
+      socket?.off('dm', onMessage);
+    };
+  }, [socket, onMessage]);
 
   // 로딩 시 스크롤바 제일 아래로
   useEffect(() => {
@@ -179,12 +186,8 @@ const DirectMessage = () => {
     return null;
   }
 
-  if (!chatData) {
-    return null;
-  }
-
   const chatSections = makeSection(chatData ? chatData.pages.flat().reverse() : []);
-  // const chatSections = makeSection(chatData ? [].concat(chatData) : []);
+  // const chatSections = makSection(chatData ? [].concat(chatData) : []);
   // const chatSections = makeSection(chatData ? [...chatData] : []);
 
   return (
@@ -196,7 +199,7 @@ const DirectMessage = () => {
       <ChatList
         chatSections={chatSections}
         ref={scrollbarRef}
-        // fetchNext={fetchNextPage}
+        fetchNext={fetchNextPage}
         isReachingEnd={isReachingEnd}
         chatData={chatData}
       />

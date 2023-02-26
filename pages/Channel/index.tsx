@@ -8,33 +8,37 @@ import useSocket from '@hooks/useSocket';
 import { Container, Header, DragOver } from '@pages/Channel/styles';
 import { Channel, Chat, DM, User } from '@typings/db';
 import fetcher from '@utils/fetcher';
-// import makeSection from '@utils/makeSection';
+import makeSection from '@utils/makeSection';
 import axios, { AxiosError } from 'axios';
-// import Scrollbars from 'react-custom-scrollbars-2';
+import Scrollbars from 'react-custom-scrollbars-2';
 import { useParams } from 'react-router';
 
 const ChannelPage = () => {
+  const perPage = 10;
   const queryClient = useQueryClient();
   const { workspace, channel } = useParams<{ workspace: string; channel: string }>();
   const [socket] = useSocket(workspace);
   const { data: myData } = useQuery(['user'], () => fetcher({ queryKey: '/api/users' }));
   const [chat, onChangeChat, setChat] = useInput('');
-  const { data: channelData } = useQuery<Channel>(['workspace', workspace, 'channel', channel, 'chat'], () =>
+  const { data: channelData } = useQuery<Channel>(['workspace', workspace, 'channel', channel], () =>
     fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}` }),
   );
+  console.log(workspace, channel);
   const {
     data: chatData,
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery<Chat[]>(
     ['workspace', workspace, 'channel', channel, 'chat'],
-    ({ pageParam }) =>
-      // fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=${pageParam + 1}` }),
-      fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=1` }),
+    ({ pageParam = 0 }) =>
+      fetcher({
+        // queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=${perPage}&page=${pageParam + 1}`,
+        queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=${perPage}&page=1`,
+      }),
     {
       getNextPageParam: (lastPage, pages) => {
-        // if (lastPage.length === 0) return;
-        // return pages.length;
+        if (lastPage.length === 0) return;
+        return pages.length;
       },
     },
   );
@@ -45,9 +49,11 @@ const ChannelPage = () => {
       enabled: !!myData,
     },
   );
-  // const isEmpty = chatData?.pages[0]?.length === 0;
-  // const isReachingEnd = isEmpty || (chatData && chatData.pages[chatData.pages.length - 1]?.length < 20) || false;
-  // const scrollbarRef = useRef<Scrollbars>(null);
+
+  console.log('chatData', chatData);
+  const isEmpty = chatData?.pages[0]?.length === 0;
+  const isReachingEnd = isEmpty || (chatData && chatData.pages[chatData.pages.length - 1]?.length < 20) || false;
+  const scrollbarRef = useRef<Scrollbars>(null);
   const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
@@ -58,17 +64,17 @@ const ChannelPage = () => {
       onMutate(mutateData) {
         if (!channelData) return;
         queryClient.setQueryData<InfiniteData<Chat[]>>(['workspace', workspace, 'channel', channel, 'chat'], (data) => {
-          // console.log('data', data);
-          // const newPages = data?.pages.slice() || [];
-          // newPages[0].unshift({
-          //   id: (data?.pages[0][0]?.id || 0) + 1,
-          //   content: mutateData.content,
-          //   UserId: myData.id,
-          //   User: myData,
-          //   ChannelId: channelData.id,
-          //   Channel: channelData,
-          //   createdAt: new Date(),
-          // });
+          console.log('data', data);
+          const newPages = data?.pages.slice() || [];
+          newPages[0].unshift({
+            id: (data?.pages[0][0]?.id || 0) + 1,
+            content: mutateData.content,
+            UserId: myData.id,
+            User: myData,
+            ChannelId: channelData.id,
+            Channel: channelData,
+            createdAt: new Date(),
+          });
           return {
             pageParams: data?.pageParams || [],
             // pages: newPages,
@@ -76,7 +82,7 @@ const ChannelPage = () => {
           };
         });
         setChat('');
-        // scrollbarRef.current?.scrollToBottom();
+        scrollbarRef.current?.scrollToBottom();
       },
       onError(error) {
         console.error(error);
@@ -94,10 +100,19 @@ const ChannelPage = () => {
       e.preventDefault();
       console.log(chat);
       if (chat?.trim() && chatData && channelData) {
-        mutation.mutate({ content: chat });
+        // mutation.mutate({ content: chat });
+        axios
+          .post(`/api/workspaces/${workspace}/channels/${channel}/chats`, {
+            content: chat,
+          })
+          .then(() => {
+            setChat('');
+            scrollbarRef.current?.scrollToBottom();
+          })
+          .catch(console.error);
       }
     },
-    [chat, chatData, channelData, mutation],
+    [channel, channelData, chat, chatData, setChat, workspace],
   );
 
   const onMessage = useCallback(
@@ -112,39 +127,39 @@ const ChannelPage = () => {
             pages: newPages,
           };
         });
-        // if (scrollbarRef.current) {
-        //   if (
-        //     scrollbarRef.current.getScrollHeight() <
-        //     scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
-        //   ) {
-        //     console.log('scrollToBottom!', scrollbarRef.current?.getValues());
-        //     setTimeout(() => {
-        //       scrollbarRef.current?.scrollToBottom();
-        //     }, 50);
-        //   }
-        // }
+        if (scrollbarRef.current) {
+          if (
+            scrollbarRef.current.getScrollHeight() <
+            scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
+          ) {
+            console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+            setTimeout(() => {
+              scrollbarRef.current?.scrollToBottom();
+            }, 50);
+          }
+        }
       }
     },
     [channel, myData, queryClient, workspace],
   );
 
-  // useEffect(() => {
-  //   socket?.on('message', onMessage);
-  //   return () => {
-  //     socket?.off('message', onMessage);
-  //   };
-  // }, [socket, onMessage]);
+  useEffect(() => {
+    socket?.on('message', onMessage);
+    return () => {
+      socket?.off('message', onMessage);
+    };
+  }, [socket, onMessage]);
 
   // 로딩 시 스크롤바 제일 아래로
-  // useEffect(() => {
-  //   if (chatData?.pages.length === 1) {
-  //     console.log('toBottomWhenLoaded', scrollbarRef.current);
-  //     setTimeout(() => {
-  //       console.log('scrollbar', scrollbarRef.current);
-  //       scrollbarRef.current?.scrollToBottom();
-  //     }, 500);
-  //   }
-  // }, [chatData]);
+  useEffect(() => {
+    if (chatData?.pages.length === 1) {
+      console.log('toBottomWhenLoaded', scrollbarRef.current);
+      setTimeout(() => {
+        console.log('scrollbar', scrollbarRef.current);
+        scrollbarRef.current?.scrollToBottom();
+      }, 500);
+    }
+  }, [chatData]);
 
   const onClickInviteChannel = useCallback(() => {
     setShowInviteChannelModal(true);
@@ -209,7 +224,7 @@ const ChannelPage = () => {
     return null;
   }
 
-  // const chatSections = makeSection(chatData ? chatData.pages.flat().reverse() : []);
+  const chatSections = makeSection(chatData ? chatData.pages.flat().reverse() : []);
 
   return (
     <Container onDrop={onDrop} onDragOver={onDragOver}>
@@ -228,12 +243,12 @@ const ChannelPage = () => {
           </button>
         </div>
       </Header>
-      {/*<ChatList*/}
-      {/*  chatSections={chatSections}*/}
-      {/*  ref={scrollbarRef}*/}
-      {/*  fetchNext={fetchNextPage}*/}
-      {/*  isReachingEnd={isReachingEnd}*/}
-      {/*/>*/}
+      <ChatList
+        chatSections={chatSections}
+        ref={scrollbarRef}
+        fetchNext={fetchNextPage}
+        isReachingEnd={isReachingEnd}
+      />
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
       <InviteChannelModal
         show={showInviteChannelModal}
