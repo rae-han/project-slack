@@ -30,15 +30,15 @@ const ChannelPage = () => {
     hasNextPage,
   } = useInfiniteQuery<Chat[]>(
     ['workspace', workspace, 'channel', channel, 'chat'],
-    ({ pageParam = 0 }) =>
+    ({ pageParam = 1 }) =>
       fetcher({
-        // queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=${perPage}&page=${pageParam + 1}`,
-        queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=${perPage}&page=1`,
+        queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=${perPage}&page=${pageParam}`,
       }),
     {
       getNextPageParam: (lastPage, pages) => {
-        if (lastPage.length === 0) return;
-        return pages.length;
+        console.log('lastPage, pages', lastPage, pages);
+        // if (lastPage?.length === 0) return;
+        return pages.length + 1;
       },
     },
   );
@@ -59,7 +59,11 @@ const ChannelPage = () => {
 
   const mutation = useMutation<DM, AxiosError, { content: string }>(
     ['workspace', workspace, 'channel', channel, 'chat'],
-    () => fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats` }),
+    // () => fetcher({ queryKey: `/api/workspaces/${workspace}/channels/${channel}/chats` }),
+    () =>
+      axios.post(`/api/workspaces/${workspace}/channels/${channel}/chats`, {
+        content: chat,
+      }),
     {
       onMutate(mutateData) {
         if (!channelData) return;
@@ -77,8 +81,8 @@ const ChannelPage = () => {
           });
           return {
             pageParams: data?.pageParams || [],
-            // pages: newPages,
-            pages: [],
+            pages: newPages,
+            // pages: [],
           };
         });
         setChat('');
@@ -100,19 +104,19 @@ const ChannelPage = () => {
       e.preventDefault();
       console.log(chat);
       if (chat?.trim() && chatData && channelData) {
-        // mutation.mutate({ content: chat });
-        axios
-          .post(`/api/workspaces/${workspace}/channels/${channel}/chats`, {
-            content: chat,
-          })
-          .then(() => {
-            setChat('');
-            scrollbarRef.current?.scrollToBottom();
-          })
-          .catch(console.error);
+        mutation.mutate({ content: chat });
+        // axios
+        //   .post(`/api/workspaces/${workspace}/channels/${channel}/chats`, {
+        //     content: chat,
+        //   })
+        //   .then(() => {
+        //     setChat('');
+        //     scrollbarRef.current?.scrollToBottom();
+        //   })
+        //   .catch(console.error);
       }
     },
-    [channel, channelData, chat, chatData, setChat, workspace],
+    [channelData, chat, chatData, mutation],
   );
 
   const onMessage = useCallback(

@@ -686,7 +686,16 @@ npm run dev && npm run build
 하면 병렬처리 안하고 직렬처리 한다.
 이걸 동시에 할수 있도록 하는 패키지
 
+# Bunus
 
+onDrop, onDragOver
+onDragOver는 마우스 클릭을 한 상태에서 쭉 이동할 때
+onDrop은 마우스에서 손 땔 때
+
+# image
+브라우저 자체 지연 로딩 loading="lazy"
+srcset 속성을 사용하여 크기, 해상도 교려한 이미지를 제공
+aspect-ratio 로 영역 확보
 
 
 
