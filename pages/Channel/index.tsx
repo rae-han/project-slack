@@ -165,6 +165,10 @@ const ChannelPage = () => {
     }
   }, [chatData]);
 
+  useEffect(() => {
+    localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
+  }, [workspace, channel]);
+
   const onClickInviteChannel = useCallback(() => {
     setShowInviteChannelModal(true);
   }, []);
