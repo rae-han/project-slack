@@ -64,8 +64,7 @@ const DMList: React.FC = () => {
                 <i
                   className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence ${
                     isOnline ? 'c-presence--active c-icon--presence-online' : 'c-icon--presence-offline'
-                  }`}
-                  aria-hidden="true"
+                  }`}\                  aria-hidden="true"
                   data-qa="presence_indicator"
                   data-qa-presence-self="false"
                   data-qa-presence-active="false"
